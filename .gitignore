@@ -21,3 +21,10 @@ worker/voices/
 *.mp3
 *.flac
 !worker/tests/fixtures/*.wav
+
+# explainer build outputs
+examples/*/music/
+examples/*/out/
+examples/*/voice/
+examples/*/timeline.js
+examples/*/timeline.json

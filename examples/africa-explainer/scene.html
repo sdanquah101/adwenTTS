@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Africa explainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="map.js"></script>
+<script src="timeline.js"></script>
+<style>
+  :root { --bg0:#0b1020; --bg1:#161c38; --ink:#f5f1e8; --muted:#aab2c8; --accent:#f2b134; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { width:1920px; height:1080px; overflow:hidden; background:var(--bg0); font-family:"Inter","DejaVu Sans",system-ui,sans-serif; color:var(--ink); }
+  #stage { position:relative; width:1920px; height:1080px; background:radial-gradient(1400px 900px at 70% 40%, var(--bg1), var(--bg0) 70%); overflow:hidden; }
+  #particles { position:absolute; inset:0; }
+  #particles i { position:absolute; width:4px; height:4px; border-radius:50%; background:var(--accent); opacity:.35; }
+  .scene { position:absolute; inset:0; opacity:0; }
+  .copy { position:absolute; left:110px; top:150px; width:820px; }
+  .era { font-size:26px; letter-spacing:.28em; text-transform:uppercase; color:var(--accent); font-weight:700; }
+  .year { display:inline-block; margin-top:18px; padding:8px 18px; border:2px solid var(--accent); border-radius:999px; font-size:26px; font-weight:500; color:var(--ink); }
+  .title { margin-top:34px; font-family:"Fraunces","DejaVu Serif",Georgia,serif; font-weight:900; font-size:88px; line-height:1.02; letter-spacing:-.01em; }
+  .facts { margin-top:44px; list-style:none; }
+  .facts li { display:flex; gap:18px; align-items:flex-start; font-size:34px; line-height:1.3; color:var(--muted); margin-bottom:22px; }
+  .facts li::before { content:""; flex:0 0 14px; width:14px; height:14px; margin-top:16px; border-radius:50%; background:var(--accent); box-shadow:0 0 18px var(--accent); }
+  .mapwrap { position:absolute; left:960px; top:30px; width:940px; height:940px; }
+  svg.map { width:100%; height:100%; overflow:visible; }
+  .country { fill:#1c2644; stroke:#3b4a76; stroke-width:1.2; }
+  .country.hi { stroke:#ffffff55; }
+  .pin circle.dot { fill:#fff; }
+  .pin circle.ring { fill:none; stroke:#fff; stroke-width:2; }
+  .pin text { font-family:"Inter","DejaVu Sans",sans-serif; font-size:22px; font-weight:700; fill:#fff; paint-order:stroke; stroke:#0b1020; stroke-width:6px; stroke-linejoin:round; }
+  #timeline { position:absolute; left:160px; right:160px; bottom:70px; height:60px; }
+  #timeline .bar { position:absolute; left:0; right:0; top:28px; height:3px; background:#2a3356; }
+  #timeline .fill { position:absolute; left:0; top:28px; height:3px; background:var(--accent); box-shadow:0 0 12px var(--accent); }
+  #timeline .tick { position:absolute; top:22px; width:14px; height:14px; margin-left:-7px; border-radius:50%; background:#2a3356; border:2px solid #3b4a76; }
+  #timeline .tick.on { background:var(--accent); border-color:var(--accent); box-shadow:0 0 14px var(--accent); }
+  #timeline .lbl { position:absolute; top:50px; transform:translateX(-50%); font-size:18px; color:var(--muted); white-space:nowrap; letter-spacing:.04em; }
+  #timeline .lbl.on { color:var(--ink); font-weight:700; }
+  #brand { position:absolute; right:60px; top:36px; font-size:20px; letter-spacing:.2em; color:var(--muted); text-transform:uppercase; }
+  .counter { font-family:"Fraunces","DejaVu Serif",serif; font-weight:900; font-size:150px; line-height:1; color:var(--accent); }
+  .counter small { display:block; font-family:"Inter","DejaVu Sans",sans-serif; font-weight:500; font-size:30px; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; margin-top:6px; }
+  #counters { position:absolute; left:110px; top:560px; display:flex; gap:120px; }
+  .motif { position:absolute; inset:0; pointer-events:none; }
+  #vignette { position:absolute; inset:0; background:radial-gradient(1200px 800px at 50% 50%, transparent 55%, rgba(0,0,0,.55)); pointer-events:none; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="particles"></div>
+  <div id="scenes"></div>
+  <div id="timeline"></div>
+  <div id="brand">AdwenTTS · Explainer</div>
+  <div id="vignette"></div>
+</div>
+<script>
+const W = 1920, H = 1080;
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const easeOut = p => 1 - Math.pow(1 - clamp(p), 3);
+const easeInOut = p => { p = clamp(p); return p < .5 ? 4*p*p*p : 1 - Math.pow(-2*p + 2, 3) / 2; };
+const backOut = p => { p = clamp(p); const c = 1.70158; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+const lerp = (a, b, p) => a + (b - a) * p;
+
+const A = window.AFRICA, TL = window.TIMELINE;
+const MAP_PX = 940 / A.box; // page px per map unit
+function proj(lon, lat) { // lon/lat -> page px inside .mapwrap
+  const x = (A.proj.ox + (lon - A.proj.min_lon) * A.proj.scale) * MAP_PX;
+  const y = (A.proj.oy + (A.proj.max_lat - lat) * A.proj.scale) * MAP_PX;
+  return [x, y];
+}
+
+// ---------- particles ----------
+const parts = [];
+(function () {
+  const host = document.getElementById('particles');
+  for (let i = 0; i < 70; i++) {
+    const el = document.createElement('i'); host.appendChild(el);
+    parts.push({ el, x: Math.random() * W, y: Math.random() * H, s: .5 + Math.random() * 1.5, ph: Math.random() * 6.28, sp: 6 + Math.random() * 14 });
+  }
+})();
+
+// ---------- timeline ----------
+const ticks = [];
+(function () {
+  const host = document.getElementById('timeline');
+  host.innerHTML = '<div class="bar"></div><div class="fill" id="tlfill"></div>';
+  TL.scenes.forEach((s, i) => {
+    const x = (i / (TL.scenes.length - 1)) * 100;
+    const t = document.createElement('div'); t.className = 'tick'; t.style.left = x + '%';
+    const l = document.createElement('div'); l.className = 'lbl'; l.style.left = x + '%'; l.textContent = s.tick || s.year;
+    host.appendChild(t); host.appendChild(l); ticks.push([t, l]);
+  });
+})();
+
+// ---------- scenes ----------
+const SVG = 'http://www.w3.org/2000/svg';
+const sceneEls = TL.scenes.map((s, idx) => {
+  const root = document.createElement('div'); root.className = 'scene'; root.style.setProperty('--accent', s.accent);
+  root.innerHTML = `
+    <div class="copy">
+      <div class="era">${s.era}</div><br>
+      <div class="year">${s.year}</div>
+      <div class="title">${s.title}</div>
+      <ul class="facts">${s.facts.map(f => `<li>${f}</li>`).join('')}</ul>
+    </div>
+    <div class="mapwrap"><svg class="map" viewBox="0 0 ${A.box} ${A.box}"></svg></div>
+    <svg class="motif" viewBox="0 0 ${W} ${H}"></svg>`;
+  const svg = root.querySelector('svg.map');
+  const countries = {};
+  for (const [iso, c] of Object.entries(A.countries)) {
+    const p = document.createElementNS(SVG, 'path'); p.setAttribute('d', c.d); p.setAttribute('class', 'country');
+    svg.appendChild(p); countries[iso] = p;
+  }
+  const hiSet = new Set(s.highlights);
+  const pins = s.pins.map(pin => {
+    const g = document.createElementNS(SVG, 'g'); g.setAttribute('class', 'pin');
+    const [x, y] = [ (A.proj.ox + (pin.lon - A.proj.min_lon) * A.proj.scale), (A.proj.oy + (A.proj.max_lat - pin.lat) * A.proj.scale) ];
+    g.innerHTML = `<circle class="ring" cx="${x}" cy="${y}" r="10"/><circle class="dot" cx="${x}" cy="${y}" r="6"/><text x="${x + 14}" y="${y - 12}">${pin.label}</text>`;
+    svg.appendChild(g); return { g, x, y };
+  });
+  // intro counters
+  if (s.motif === 'counters') {
+    const c = document.createElement('div'); c.id = 'counters';
+    c.innerHTML = `<div class="counter"><span id="c54">0</span><small>countries</small></div><div class="counter"><span id="c14">0</span><small>billion people</small></div>`;
+    root.querySelector('.copy').appendChild(c);
+    root.querySelector('.facts').style.display = 'none';
+  }
+  document.getElementById('scenes').appendChild(root);
+  return { s, root, svg, countries, hiSet, pins, motif: root.querySelector('svg.motif'), idx };
+});
+
+// ---------- motifs ----------
+function drawMotif(sc, lt, p) {
+  const m = sc.motif; const s = sc.s; const accent = s.accent;
+  const off = (x, y) => [960 + x * MAP_PX, 30 + y * MAP_PX]; // map-unit -> page px
+  let html = '';
+  if (s.motif === 'pyramids') {
+    const base = [ [1120, 870], [1240, 870], [1330, 870] ];
+    [[1120, 870, 150], [1250, 870, 110], [1340, 870, 80]].forEach(([x, y, h], i) => {
+      const k = easeOut((lt - .4 - i * .25) / .8);
+      html += `<polygon points="${x - h*.9},${y} ${x + h*.9},${y} ${x},${y - h*k}" fill="${accent}" opacity="${.85 * k}"/>
+               <polygon points="${x},${y} ${x + h*.9},${y} ${x},${y - h*k}" fill="#000" opacity="${.25 * k}"/>`;
+    });
+    const sun = easeOut((lt - .2) / 1.2);
+    html += `<circle cx="1480" cy="${900 - 140 * sun}" r="46" fill="${accent}" opacity="${.9 * sun}"/>`;
+  } else if (s.motif === 'arrows') {
+    const routes = [ [[11, 5], [22, -2], [36, -12]], [[11, 5], [14, -14], [25, -29]], [[11, 5], [8, -4], [15, -16]] ];
+    routes.forEach((r, i) => {
+      const [a, c, b] = r.map(([lo, la]) => off(...projUnits(lo, la)));
+      const d = `M${a[0]} ${a[1]} Q${c[0]} ${c[1]} ${b[0]} ${b[1]}`;
+      const k = easeInOut((lt - .6 - i * .35) / 1.6);
+      html += `<path d="${d}" fill="none" stroke="${accent}" stroke-width="8" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${1 - k}" opacity=".95"/>`;
+      if (k > .97) {
+        const ang = Math.atan2(b[1] - c[1], b[0] - c[0]);
+        const tip = (dx, dy) => `${b[0] + Math.cos(ang + dx) * dy},${b[1] + Math.sin(ang + dx) * dy}`;
+        html += `<polygon points="${tip(0, 18)} ${tip(2.5, 22)} ${tip(-2.5, 22)}" fill="${accent}"/>`;
+      }
+    });
+  } else if (s.motif === 'caravan') {
+    const route = [[-3, 16.8], [2, 22], [10, 26], [18, 28], [26, 29], [31.2, 30.05]].map(([lo, la]) => off(...projUnits(lo, la)));
+    const d = 'M' + route.map(q => q.join(' ')).join(' L');
+    html += `<path d="${d}" fill="none" stroke="${accent}" stroke-width="3" stroke-dasharray="12 14" opacity=".6"/>`;
+    for (let i = 0; i < 6; i++) {
+      const k = clamp(((lt * .12) + i * .07) % 1.0);
+      const [x, y] = pointOnPolyline(route, k);
+      html += `<circle cx="${x}" cy="${y}" r="7" fill="${accent}"/>`;
+    }
+    // gold shimmer in Mali
+    const [gx, gy] = off(...projUnits(-6, 14)); const sh = .5 + .5 * Math.sin(lt * 4);
+    html += `<circle cx="${gx}" cy="${gy}" r="${30 + 10 * sh}" fill="${accent}" opacity="${.15 + .15 * sh}"/>`;
+  } else if (s.motif === 'ships') {
+    for (let i = 0; i < 7; i++) {
+      const start = off(...projUnits(-2 + (i % 3) * 4, 4 - (i % 4) * 4));
+      const k = clamp(((lt * .09) + i * .13) % 1.0);
+      const x = start[0] - 420 * k, y = start[1] + 30 * Math.sin(k * 6 + i);
+      html += `<polygon points="${x},${y} ${x + 26},${y} ${x + 13},${y - 22}" fill="#c9ccd6" opacity="${.9 * (1 - k)}"/>`;
+    }
+    html += `<rect x="0" y="0" width="1920" height="1080" fill="#000" opacity="${.25 * easeOut(lt / 1.5)}"/>`;
+  } else if (s.motif === 'borders') {
+    const lines = [ [[-17, 20], [36, 20]], [[-10, 10], [40, 10]], [[12, 35], [12, -18]], [[25, 30], [25, -22]], [[-17, 5], [45, 5]], [[30, -5], [30, -35]] ];
+    lines.forEach((ln, i) => {
+      const a = off(...projUnits(...ln[0])), b = off(...projUnits(...ln[1]));
+      const k = easeInOut((lt - .5 - i * .35) / 1.0);
+      html += `<line x1="${a[0]}" y1="${a[1]}" x2="${lerp(a[0], b[0], k)}" y2="${lerp(a[1], b[1], k)}" stroke="#e6e9f2" stroke-width="4" stroke-dasharray="14 10" opacity=".8"/>`;
+    });
+  } else if (s.motif === 'bursts') {
+    const spots = s.pins.concat([{lon: 3.4, lat: 6.5}, {lon: 15, lat: 12}, {lon: 30, lat: 0}, {lon: 45, lat: 2}, {lon: 47, lat: -20}, {lon: -14, lat: 14}]);
+    spots.forEach((pin, i) => {
+      const [x, y] = off(...projUnits(pin.lon, pin.lat));
+      const k = clamp((lt - .8 - i * .35) / 1.4);
+      if (k <= 0) return;
+      for (let j = 0; j < 8; j++) {
+        const ang = j * Math.PI / 4; const r = 10 + 70 * easeOut(k);
+        html += `<line x1="${x + Math.cos(ang) * 10}" y1="${y + Math.sin(ang) * 10}" x2="${x + Math.cos(ang) * r}" y2="${y + Math.sin(ang) * r}" stroke="${accent}" stroke-width="4" stroke-linecap="round" opacity="${1 - k}"/>`;
+      }
+    });
+  } else if (s.motif === 'network') {
+    const pts = s.pins.map(pin => off(...projUnits(pin.lon, pin.lat)));
+    for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) {
+      const k = easeInOut((lt - .5 - (i + j) * .12) / 1.2);
+      html += `<line x1="${pts[i][0]}" y1="${pts[i][1]}" x2="${lerp(pts[i][0], pts[j][0], k)}" y2="${lerp(pts[i][1], pts[j][1], k)}" stroke="${accent}" stroke-width="2" opacity=".35"/>`;
+    }
+    const pulse = .5 + .5 * Math.sin(lt * 2);
+    pts.forEach(([x, y]) => html += `<circle cx="${x}" cy="${y}" r="${8 + 6 * pulse}" fill="${accent}" opacity=".35"/>`);
+  } else if (s.motif === 'origins') {
+    s.pins.forEach((pin, i) => {
+      const [x, y] = off(...projUnits(pin.lon, pin.lat));
+      for (let r = 0; r < 3; r++) {
+        const k = ((lt * .5) + r / 3 + i * .2) % 1;
+        html += `<circle cx="${x}" cy="${y}" r="${20 + 140 * k}" fill="none" stroke="${accent}" stroke-width="3" opacity="${(1 - k) * .7}"/>`;
+      }
+    });
+  }
+  m.innerHTML = html;
+}
+function projUnits(lon, lat) { return [A.proj.ox + (lon - A.proj.min_lon) * A.proj.scale, A.proj.oy + (A.proj.max_lat - lat) * A.proj.scale]; }
+function pointOnPolyline(pts, k) {
+  const lens = []; let total = 0;
+  for (let i = 1; i < pts.length; i++) { const l = Math.hypot(pts[i][0] - pts[i-1][0], pts[i][1] - pts[i-1][1]); lens.push(l); total += l; }
+  let d = k * total;
+  for (let i = 0; i < lens.length; i++) { if (d <= lens[i]) { const q = d / lens[i]; return [lerp(pts[i][0], pts[i+1][0], q), lerp(pts[i][1], pts[i+1][1], q)]; } d -= lens[i]; }
+  return pts[pts.length - 1];
+}
+function fmtNum(n, dec) { return dec ? n.toFixed(dec) : Math.round(n).toLocaleString('en-US'); }
+
+// ---------- master render ----------
+window.render = function (t) {
+  // particles
+  for (const p of parts) {
+    const y = ((p.y - t * p.sp) % H + H) % H;
+    const x = p.x + Math.sin(t * .4 + p.ph) * 18;
+    p.el.style.transform = `translate(${x}px, ${y}px) scale(${p.s})`;
+    p.el.style.opacity = .18 + .22 * (.5 + .5 * Math.sin(t * 1.3 + p.ph));
+  }
+  // timeline
+  let active = 0;
+  TL.scenes.forEach((s, i) => { if (t >= s.start) active = i; });
+  const cur = TL.scenes[active];
+  const prog = clamp((t - cur.start) / cur.dur);
+  const pct = ((active + Math.min(prog * 1.2, 1) * 0) / (TL.scenes.length - 1)) * 100;
+  const nextPct = (Math.min(active + easeInOut((t - cur.start) / Math.max(cur.dur, .1)), TL.scenes.length - 1) / (TL.scenes.length - 1)) * 100;
+  document.getElementById('tlfill').style.width = nextPct + '%';
+  ticks.forEach(([tk, lb], i) => { tk.classList.toggle('on', i <= active); lb.classList.toggle('on', i === active); });
+
+  const FADE = .6;
+  for (const sc of sceneEls) {
+    const s = sc.s; const lt = t - s.start;
+    if (lt < -0.05 || lt > s.dur + FADE) { sc.root.style.opacity = 0; sc.root.style.display = 'none'; continue; }
+    sc.root.style.display = 'block';
+    const op = Math.min(easeOut(lt / FADE), 1 - easeInOut((lt - s.dur) / FADE));
+    sc.root.style.opacity = clamp(op);
+    // copy entrance
+    const copy = sc.root.querySelector('.copy');
+    copy.style.transform = `translateY(${30 * (1 - easeOut(lt / .9))}px)`;
+    sc.root.querySelector('.era').style.opacity = easeOut(lt / .5);
+    sc.root.querySelector('.year').style.opacity = easeOut((lt - .15) / .5);
+    sc.root.querySelector('.title').style.opacity = easeOut((lt - .25) / .7);
+    sc.root.querySelectorAll('.facts li').forEach((li, i) => {
+      const k = easeOut((lt - 1.1 - i * (s.dur > 12 ? 2.2 : 1.6)) / .6);
+      li.style.opacity = k; li.style.transform = `translateX(${-24 * (1 - k)}px)`;
+    });
+    // map: slow drift + zoom, highlights, pins
+    const mw = sc.root.querySelector('.mapwrap');
+    const z = 1 + .04 * easeInOut(lt / s.dur);
+    mw.style.transform = `translate(${-10 * (lt / s.dur)}px, ${6 * Math.sin(lt * .3)}px) scale(${z})`;
+    let hi = 0;
+    for (const [iso, el] of Object.entries(sc.countries)) {
+      if (sc.hiSet.has(iso)) {
+        const k = easeOut((lt - .5 - hi * .12) / .7); hi++;
+        el.style.fill = s.accent; el.style.fillOpacity = (.25 + .6 * k).toFixed(3); el.classList.add('hi');
+        el.style.filter = `drop-shadow(0 0 ${10 * k}px ${s.accent})`;
+      } else if (s.motif === 'counters' || s.motif === 'network') {
+        const wave = .5 + .5 * Math.sin(lt * 1.5 + (A.countries[iso].cx + A.countries[iso].cy) / 120);
+        el.style.fill = s.accent; el.style.fillOpacity = (.08 + .22 * wave).toFixed(3);
+      } else if (s.motif === 'borders' && lt > 2.5) {
+        el.style.fill = '#6a7390'; el.style.fillOpacity = (.15 + .35 * easeOut((lt - 2.5) / 2)).toFixed(3);
+      } else { el.style.fill = ''; el.style.fillOpacity = ''; el.style.filter = ''; }
+    }
+    sc.pins.forEach((pin, i) => {
+      const k = backOut((lt - 1.2 - i * .45) / .5);
+      pin.g.style.transformOrigin = `${pin.x}px ${pin.y}px`;
+      pin.g.style.transform = `scale(${clamp(k, 0, 1.2)})`; pin.g.style.opacity = clamp(k * 2);
+      const ring = pin.g.querySelector('.ring'); const ph = ((lt * .8) + i * .3) % 1;
+      ring.setAttribute('r', 10 + 30 * ph); ring.style.opacity = 1 - ph;
+    });
+    if (s.motif === 'counters') {
+      const k = easeOut((lt - .8) / 2.2);
+      document.getElementById('c54').textContent = fmtNum(54 * k);
+      document.getElementById('c14').textContent = fmtNum(1.4 * k, 1);
+    }
+    drawMotif(sc, lt, prog);
+  }
+};
+window.__ready = document.fonts ? document.fonts.ready.then(() => true) : Promise.resolve(true);
+render(0);
+</script>
+</body>
+</html>

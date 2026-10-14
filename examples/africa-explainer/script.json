@@ -1,0 +1,401 @@
+{
+  "title": "A Short History of Africa in 3 Minutes",
+  "scenes": [
+    {
+      "id": "intro",
+      "era": "The continent",
+      "year": "Today",
+      "accent": "#f2b134",
+      "motif": "counters",
+      "title": "A Short History of Africa",
+      "facts": [
+        "54 countries",
+        "1.4 billion people",
+        "The longest human story on Earth"
+      ],
+      "highlights": [],
+      "pins": [],
+      "narration": "Africa. Fifty-four countries, over one point four billion people, and the longest human story on Earth. Let's tell it in three minutes.",
+      "tick": "Africa"
+    },
+    {
+      "id": "origins",
+      "era": "Origins",
+      "year": "300,000 years ago",
+      "accent": "#f2b134",
+      "motif": "origins",
+      "title": "The cradle of humanity",
+      "facts": [
+        "First Homo sapiens in Morocco and Ethiopia",
+        "Every human alive descends from them"
+      ],
+      "highlights": [
+        "MAR",
+        "ETH"
+      ],
+      "pins": [
+        {
+          "lon": -8.9,
+          "lat": 31.9,
+          "label": "Jebel Irhoud"
+        },
+        {
+          "lon": 36.3,
+          "lat": 4.9,
+          "label": "Omo Valley"
+        }
+      ],
+      "narration": "Our story begins here. Around three hundred thousand years ago, the first Homo sapiens walked the land that is now Morocco and Ethiopia. Every human alive today descends from these African ancestors.",
+      "tick": "300k BCE"
+    },
+    {
+      "id": "nile",
+      "era": "Ancient kingdoms",
+      "year": "3100 BCE to 700 CE",
+      "accent": "#e8a33a",
+      "motif": "pyramids",
+      "title": "Egypt, Kush and Aksum",
+      "facts": [
+        "Pyramids, writing, a 3,000-year state",
+        "Kush ruled Egypt as its 25th dynasty",
+        "Aksum: trading power of the ancient world"
+      ],
+      "highlights": [
+        "EGY",
+        "SDN",
+        "ETH",
+        "ERI"
+      ],
+      "pins": [
+        {
+          "lon": 31.1,
+          "lat": 29.98,
+          "label": "Giza"
+        },
+        {
+          "lon": 31.8,
+          "lat": 18.5,
+          "label": "Meroë"
+        },
+        {
+          "lon": 38.7,
+          "lat": 14.1,
+          "label": "Aksum"
+        }
+      ],
+      "narration": "Five thousand years ago, along the Nile, Egypt rose: pyramids, writing, and a state that lasted three thousand years. To the south, the kingdom of Kush built its own pyramids and even ruled Egypt. In the highlands, Aksum became one of the great trading powers of the ancient world.",
+      "tick": "3100 BCE"
+    },
+    {
+      "id": "bantu",
+      "era": "Iron and migration",
+      "year": "1000 BCE to 500 CE",
+      "accent": "#d97b3f",
+      "motif": "arrows",
+      "title": "Iron, art and the Bantu expansion",
+      "facts": [
+        "Nok terracotta sculptures, Nigeria",
+        "Ironworking spreads across the continent",
+        "Bantu languages reach the far south"
+      ],
+      "highlights": [
+        "NGA",
+        "CMR",
+        "COD",
+        "TZA",
+        "ZMB",
+        "MOZ",
+        "ZWE",
+        "ZAF",
+        "AGO",
+        "KEN",
+        "UGA"
+      ],
+      "pins": [
+        {
+          "lon": 8.3,
+          "lat": 9.5,
+          "label": "Nok"
+        }
+      ],
+      "narration": "Meanwhile, across the continent, people were mastering iron. The Nok culture of present-day Nigeria sculpted striking terracotta figures, and Bantu-speaking farmers spread languages, crops and ironworking from West Africa all the way to the south.",
+      "tick": "1000 BCE"
+    },
+    {
+      "id": "sahel",
+      "era": "The age of gold",
+      "year": "700 to 1600 CE",
+      "accent": "#f2b134",
+      "motif": "caravan",
+      "title": "Ghana, Mali and Songhai",
+      "facts": [
+        "Caravans cross the Sahara",
+        "1324: Mansa Musa's pilgrimage moves the price of gold",
+        "Timbuktu: a city of scholars and books"
+      ],
+      "highlights": [
+        "MLI",
+        "MRT",
+        "SEN",
+        "NER",
+        "GHA",
+        "BFA",
+        "GIN"
+      ],
+      "pins": [
+        {
+          "lon": -3.0,
+          "lat": 16.77,
+          "label": "Timbuktu"
+        },
+        {
+          "lon": -8.0,
+          "lat": 12.65,
+          "label": "Niani"
+        },
+        {
+          "lon": 31.2,
+          "lat": 30.05,
+          "label": "Cairo"
+        }
+      ],
+      "narration": "Then came the age of gold. Across the Sahara, caravans linked the empires of Ghana, Mali and Songhai to the Mediterranean. In thirteen twenty-four, Mansa Musa of Mali made a pilgrimage so lavish that it reshaped the price of gold in Cairo. Timbuktu became a city of scholars and books.",
+      "tick": "700 CE"
+    },
+    {
+      "id": "kingdoms",
+      "era": "A continent of states",
+      "year": "1000 to 1800 CE",
+      "accent": "#5bc0be",
+      "motif": "pins",
+      "title": "Swahili, Zimbabwe, Ethiopia, Benin",
+      "facts": [
+        "Swahili cities trade with India and China",
+        "Great Zimbabwe: stone walls without mortar",
+        "Lalibela's rock churches, Benin's bronzes"
+      ],
+      "highlights": [
+        "KEN",
+        "TZA",
+        "ZWE",
+        "ETH",
+        "NGA",
+        "COD",
+        "AGO"
+      ],
+      "pins": [
+        {
+          "lon": 39.5,
+          "lat": -8.9,
+          "label": "Kilwa"
+        },
+        {
+          "lon": 30.9,
+          "lat": -20.3,
+          "label": "Great Zimbabwe"
+        },
+        {
+          "lon": 39.0,
+          "lat": 12.0,
+          "label": "Lalibela"
+        },
+        {
+          "lon": 5.6,
+          "lat": 6.3,
+          "label": "Benin City"
+        },
+        {
+          "lon": 14.9,
+          "lat": -6.3,
+          "label": "Mbanza Kongo"
+        }
+      ],
+      "narration": "The whole continent was alive with states. Swahili city-states traded with India and China. Great Zimbabwe raised stone walls without mortar. Ethiopia carved churches from solid rock, and Benin cast bronzes that still astonish the world.",
+      "tick": "1000 CE"
+    },
+    {
+      "id": "slavery",
+      "era": "A darkness",
+      "year": "1500s to 1800s",
+      "accent": "#8b2f3f",
+      "motif": "ships",
+      "mood": "calm",
+      "title": "The Atlantic slave trade",
+      "facts": [
+        "More than 12 million people taken",
+        "Societies shattered across the coast",
+        "A wound that still shapes the world"
+      ],
+      "highlights": [
+        "SEN",
+        "GMB",
+        "GNB",
+        "GIN",
+        "SLE",
+        "LBR",
+        "CIV",
+        "GHA",
+        "TGO",
+        "BEN",
+        "NGA",
+        "CMR",
+        "GAB",
+        "COG",
+        "COD",
+        "AGO"
+      ],
+      "pins": [
+        {
+          "lon": -1.25,
+          "lat": 5.1,
+          "label": "Elmina"
+        },
+        {
+          "lon": 13.2,
+          "lat": -8.8,
+          "label": "Luanda"
+        }
+      ],
+      "narration": "Then a darkness. From the fifteen hundreds to the eighteen hundreds, the Atlantic slave trade tore more than twelve million people from Africa's shores. Societies were shattered, and the wound still shapes our world.",
+      "tick": "1500"
+    },
+    {
+      "id": "scramble",
+      "era": "Colonial rule",
+      "year": "1884 to 1914",
+      "accent": "#9aa5b8",
+      "motif": "borders",
+      "mood": "calm",
+      "title": "The Scramble for Africa",
+      "facts": [
+        "1884: the Berlin Conference divides a continent",
+        "By 1914 only Ethiopia and Liberia are free",
+        "Railways and borders, exploitation and resistance"
+      ],
+      "highlights": [
+        "ETH",
+        "LBR"
+      ],
+      "pins": [
+        {
+          "lon": 38.7,
+          "lat": 9.0,
+          "label": "Ethiopia"
+        },
+        {
+          "lon": -10.8,
+          "lat": 6.3,
+          "label": "Liberia"
+        }
+      ],
+      "narration": "In eighteen eighty-four, European powers met in Berlin and carved up the continent on a map. By nineteen fourteen, only Ethiopia and Liberia remained independent. Colonial rule brought railways and borders, but also exploitation and resistance.",
+      "tick": "1884"
+    },
+    {
+      "id": "independence",
+      "era": "Independence",
+      "year": "1957 to 1994",
+      "accent": "#3cb371",
+      "motif": "bursts",
+      "title": "Africa fights back",
+      "facts": [
+        "1957: Ghana leads, under Kwame Nkrumah",
+        "1960: seventeen new nations in one year",
+        "1994: apartheid ends, Mandela is president"
+      ],
+      "highlights": [
+        "GHA",
+        "NGA",
+        "SEN",
+        "MLI",
+        "NER",
+        "TCD",
+        "CMR",
+        "COD",
+        "SOM",
+        "MDG",
+        "CIV",
+        "BEN",
+        "BFA",
+        "TGO",
+        "GAB",
+        "COG",
+        "CAF",
+        "MRT",
+        "ZAF"
+      ],
+      "pins": [
+        {
+          "lon": -0.2,
+          "lat": 5.6,
+          "label": "Accra, 1957"
+        },
+        {
+          "lon": 28.0,
+          "lat": -26.2,
+          "label": "Johannesburg, 1994"
+        }
+      ],
+      "narration": "Africa fought back. In nineteen fifty-seven, Ghana became the first sub-Saharan colony to win independence, led by Kwame Nkrumah. Nineteen sixty alone brought seventeen new nations. And in nineteen ninety-four, apartheid ended in South Africa with Nelson Mandela as president.",
+      "tick": "1957"
+    },
+    {
+      "id": "today",
+      "era": "Now",
+      "year": "Today",
+      "accent": "#f2b134",
+      "motif": "network",
+      "title": "The story continues",
+      "facts": [
+        "The youngest continent: median age 19",
+        "Music, film and technology go global",
+        "Three minutes is not enough"
+      ],
+      "highlights": [],
+      "pins": [
+        {
+          "lon": 3.4,
+          "lat": 6.5,
+          "label": "Lagos"
+        },
+        {
+          "lon": 36.8,
+          "lat": -1.3,
+          "label": "Nairobi"
+        },
+        {
+          "lon": -0.2,
+          "lat": 5.6,
+          "label": "Accra"
+        },
+        {
+          "lon": 31.2,
+          "lat": 30.05,
+          "label": "Cairo"
+        },
+        {
+          "lon": 28.0,
+          "lat": -26.2,
+          "label": "Johannesburg"
+        },
+        {
+          "lon": 38.7,
+          "lat": 9.0,
+          "label": "Addis Ababa"
+        },
+        {
+          "lon": 32.6,
+          "lat": 0.3,
+          "label": "Kampala"
+        },
+        {
+          "lon": -17.4,
+          "lat": 14.7,
+          "label": "Dakar"
+        }
+      ],
+      "narration": "Today, Africa is the youngest continent on Earth, with a median age of nineteen. Its music, film and technology travel the globe, and its story is still being written. Three minutes is not enough. But now you know where it begins.",
+      "tick": "Now"
+    }
+  ]
+}
