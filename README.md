@@ -1,6 +1,22 @@
 # AdwenTTS
 
-Backend API service for AdwenTTS, built with TypeScript and [Fastify](https://fastify.dev).
+Voice-cloning text-to-speech for Ghanaian-accented English. Give it a short clip of a speaker and
+some text, download the audio.
+
+Two parts:
+
+| Part             | Where                         | What                                                                                                                                       |
+| ---------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Inference worker | [`worker/`](worker/README.md) | Python. Runs the TTS model (Chatterbox, MIT) with a REST API, CLI and web UI. Needs a GPU for real synthesis; a mock engine runs anywhere. |
+| API              | `src/`                        | TypeScript + [Fastify](https://fastify.dev). Health endpoints and a proxy in front of the worker.                                          |
+
+## Fastest way to try it (free GPU)
+
+Open [`notebooks/AdwenTTS_Colab.ipynb`](notebooks/AdwenTTS_Colab.ipynb) in Google Colab, pick a T4
+GPU runtime, run the cells. The last cell prints a public link to a page where you upload a
+10 to 20 second reference clip, type text and download the result as WAV or MP3.
+
+## API service
 
 ## Requirements
 
