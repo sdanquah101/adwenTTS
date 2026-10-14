@@ -28,3 +28,4 @@ examples/*/out/
 examples/*/voice/
 examples/*/timeline.js
 examples/*/timeline.json
+examples/*/voice_builtin/

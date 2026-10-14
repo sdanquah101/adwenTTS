@@ -40,6 +40,16 @@ def main() -> int:
     health = json.loads(urllib.request.urlopen(urllib.request.Request(f"{base}/health"), timeout=30).read())
     print("worker:", health.get("engine"), health.get("status"))
 
+    voice_id = None
+    if args.voice:
+        voices = json.loads(urllib.request.urlopen(urllib.request.Request(f"{base}/v1/voices", headers=headers), timeout=30).read())
+        match = next((v for v in voices if v["id"] == args.voice or v["name"].lower() == args.voice.lower()), None)
+        if match is None:
+            print(f"voice {args.voice!r} not found; available: {[v['name'] for v in voices]}", file=sys.stderr)
+            return 1
+        voice_id = match["id"]
+        print(f"voice: {match['name']} ({voice_id}, {match['duration_seconds']}s reference)")
+
     script = json.loads((HERE / "script.json").read_text())
     only = set(args.only.split(",")) if args.only else None
     (HERE / "voice").mkdir(exist_ok=True)
@@ -54,8 +64,8 @@ def main() -> int:
             "exaggeration": args.exaggeration,
             "seed": 42,
         }
-        if args.voice:
-            body["voice"] = args.voice
+        if voice_id:
+            body["voice_id"] = voice_id  # works on worker versions with and without name lookup
         req = urllib.request.Request(f"{base}/v1/tts", data=json.dumps(body).encode(), headers=headers, method="POST")
         started = time.time()
         for attempt in range(3):

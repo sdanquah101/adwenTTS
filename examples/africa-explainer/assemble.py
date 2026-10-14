@@ -126,6 +126,17 @@ def main() -> None:
         check=True,
     )
     print(f"video: {out}")
+    # compressed 720p copy for sharing (chat/email limits)
+    web = out.with_name(out.stem + "_720p.mp4")
+    subprocess.run(
+        [
+            "ffmpeg", "-y", "-loglevel", "error", "-i", str(out),
+            "-vf", "scale=1280:-2", "-c:v", "libx264", "-preset", "slow", "-crf", "25", "-pix_fmt", "yuv420p",
+            "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", str(web),
+        ],
+        check=True,
+    )
+    print(f"web copy: {web} ({web.stat().st_size / 1e6:.1f} MB)")
 
 
 if __name__ == "__main__":
