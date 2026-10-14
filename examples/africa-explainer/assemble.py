@@ -17,8 +17,8 @@ import soundfile as sf
 
 HERE = Path(__file__).parent
 SR = 44_100
-LEAD = 0.9        # seconds of visuals before the voice starts in each scene
-TAIL = 1.1        # seconds after the voice ends
+LEAD = 0.7        # seconds of visuals before the voice starts in each scene
+TAIL = 0.9        # seconds after the voice ends
 INTRO_PAD = 0.5
 
 
