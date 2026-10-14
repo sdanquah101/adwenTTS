@@ -10,6 +10,13 @@ Two parts:
 | Inference worker | [`worker/`](worker/README.md) | Python. Runs the TTS model (Chatterbox, MIT) with a REST API, CLI and web UI. Needs a GPU for real synthesis; a mock engine runs anywhere. |
 | API              | `src/`                        | TypeScript + [Fastify](https://fastify.dev). Health endpoints and a proxy in front of the worker.                                          |
 
+## Giving it to an AI model
+
+The worker exposes a REST API, an OpenAI-compatible speech endpoint and an MCP server, all
+behind one API key, with JSON responses that carry a downloadable `audio_url`. The notebook's
+"Public API" cell opens a free tunnel and prints the URL and key. See
+[`docs/AGENT_INTEGRATION.md`](docs/AGENT_INTEGRATION.md).
+
 ## Fastest way to try it (free GPU)
 
 Open [`notebooks/AdwenTTS_Colab.ipynb`](notebooks/AdwenTTS_Colab.ipynb) in Google Colab, pick a T4

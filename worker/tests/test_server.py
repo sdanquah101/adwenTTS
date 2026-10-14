@@ -41,9 +41,9 @@ def test_tts_unknown_voice_is_404(client):
     assert res.status_code == 404
 
 
-def test_tts_invalid_voice_id_is_400(client):
+def test_tts_invalid_voice_id_is_404(client):
     res = client.post("/v1/tts", json={"text": "hi", "voice_id": "../etc/passwd"})
-    assert res.status_code == 400
+    assert res.status_code == 404
 
 
 def test_tts_validation(client):

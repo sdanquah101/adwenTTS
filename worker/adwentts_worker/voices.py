@@ -66,6 +66,16 @@ class VoiceStore:
         voices = [Voice(**json.loads(p.read_text())) for p in self.directory.glob("*.json")]
         return sorted(voices, key=lambda v: v.created_at)
 
+    def resolve(self, ref: str) -> Voice | None:
+        """Find a voice by id, or by name (case-insensitive) when `ref` is not an id."""
+        if re.fullmatch(r"[0-9a-f]{12}", ref):
+            return self.get(ref)
+        wanted = ref.strip().lower()
+        for voice in self.list():
+            if voice.name.lower() == wanted:
+                return voice
+        return None
+
     def delete(self, voice_id: str) -> bool:
         existed = self.get(voice_id) is not None
         self.clip_path(voice_id).unlink(missing_ok=True)

@@ -24,7 +24,11 @@ beforeAll(async () => {
   const address = fakeWorker.server.address();
   const port = typeof address === "object" && address ? address.port : 0;
   withWorker = buildApp({
-    env: loadEnv({ NODE_ENV: "test", INFERENCE_URL: `http://127.0.0.1:${port}` }),
+    env: loadEnv({
+      NODE_ENV: "test",
+      INFERENCE_URL: `http://127.0.0.1:${port}`,
+      INFERENCE_API_KEY: "worker-key",
+    }),
   });
   await Promise.all([withWorker.ready(), withoutWorker.ready()]);
 });
@@ -65,6 +69,16 @@ describe("POST /v1/text-to-speech", () => {
     expect(res.headers["content-disposition"]).toContain("speech.wav");
     expect(res.headers["x-audio-duration-seconds"]).toBe("1.5");
     expect(res.rawPayload.toString()).toContain("Akwaaba");
+  });
+
+  it("returns the worker's JSON when response is json", async () => {
+    const res = await withWorker.inject({
+      method: "POST",
+      url: "/v1/text-to-speech",
+      payload: { text: "Akwaaba", voice: "Kofi", response: "json" },
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toEqual({ audio_url: "https://w/v1/audio/x.wav", duration_seconds: 1.5 });
   });
 
   it("passes through worker 404s", async () => {

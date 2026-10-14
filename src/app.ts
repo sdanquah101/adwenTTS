@@ -16,7 +16,10 @@ export function buildApp({ env, logger }: BuildAppOptions): FastifyInstance {
   const app = Fastify({ logger: logger ?? loggerOptions(env) });
 
   app.register(healthRoutes);
-  app.register(ttsRoutes, { inferenceUrl: env.INFERENCE_URL });
+  app.register(ttsRoutes, {
+    inferenceUrl: env.INFERENCE_URL,
+    inferenceApiKey: env.INFERENCE_API_KEY,
+  });
 
   return app;
 }

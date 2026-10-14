@@ -38,6 +38,8 @@ def main(argv: list[str] | None = None) -> int:
     serve = sub.add_parser("serve", help="run the HTTP API")
     serve.add_argument("--host")
     serve.add_argument("--port", type=int)
+    serve.add_argument("--api-key", help="require this bearer token on /v1/* and /mcp")
+    serve.add_argument("--public-url", help="externally reachable base URL for audio links")
 
     ui = sub.add_parser("ui", help="run the Gradio web UI")
     ui.add_argument("--port", type=int, default=7860)
@@ -63,6 +65,10 @@ def main(argv: list[str] | None = None) -> int:
         if device:
             os.environ["ADWENTTS_DEVICE"] = device
         os.environ["ADWENTTS_VOICES_DIR"] = str(voices_dir)
+        if args.api_key:
+            os.environ["ADWENTTS_API_KEY"] = args.api_key
+        if args.public_url:
+            os.environ["ADWENTTS_PUBLIC_URL"] = args.public_url
         uvicorn.run(
             "adwentts_worker.server:app",
             factory=True,

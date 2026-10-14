@@ -7,6 +7,8 @@ const EnvSchema = z.object({
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
   /** Base URL of the Python inference worker (worker/). Unset disables TTS routes. */
   INFERENCE_URL: z.string().url().optional(),
+  /** Bearer key the worker expects (ADWENTTS_API_KEY on the worker side). */
+  INFERENCE_API_KEY: z.string().min(1).optional(),
 });
 
 export type Env = z.infer<typeof EnvSchema>;
