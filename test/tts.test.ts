@@ -6,15 +6,25 @@ import { loadEnv } from "../src/config/env.js";
 /** Stand-in for the Python worker: returns a tiny WAV for any request. */
 const fakeWorker = Fastify();
 fakeWorker.get("/v1/voices", async () => [{ id: "0123456789ab", name: "Kofi" }]);
-fakeWorker.post<{ Body: { text: string; voice_id?: string } }>("/v1/tts", async (req, reply) => {
-  if (req.body.voice_id === "ffffffffffff")
-    return reply.code(404).send({ detail: "voice not found" });
-  return reply
-    .header("content-type", "audio/wav")
-    .header("content-disposition", 'attachment; filename="speech.wav"')
-    .header("x-audio-duration-seconds", "1.5")
-    .send(Buffer.from("RIFF....WAVEfmt " + req.body.text));
-});
+fakeWorker.post<{ Body: { text: string; voice_id?: string; response?: string } }>(
+  "/v1/tts",
+  async (req, reply) => {
+    if (req.headers.authorization !== "Bearer worker-key") {
+      return reply.code(401).send({ detail: "no key" });
+    }
+    if (req.body.voice_id === "ffffffffffff") {
+      return reply.code(404).send({ detail: "voice not found" });
+    }
+    if (req.body.response === "json") {
+      return reply.send({ audio_url: "https://w/v1/audio/x.wav", duration_seconds: 1.5 });
+    }
+    return reply
+      .header("content-type", "audio/wav")
+      .header("content-disposition", 'attachment; filename="speech.wav"')
+      .header("x-audio-duration-seconds", "1.5")
+      .send(Buffer.from("RIFF....WAVEfmt " + req.body.text));
+  },
+);
 
 let withWorker: ReturnType<typeof buildApp>;
 const withoutWorker = buildApp({ env: loadEnv({ NODE_ENV: "test" }) });
