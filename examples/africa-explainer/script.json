@@ -5,7 +5,7 @@
       "id": "intro",
       "era": "The continent",
       "year": "Today",
-      "accent": "#f2b134",
+      "accent": "#b388ff",
       "motif": "counters",
       "title": "A Short History of Africa",
       "facts": [
@@ -22,7 +22,7 @@
       "id": "origins",
       "era": "Origins",
       "year": "300,000 years ago",
-      "accent": "#f2b134",
+      "accent": "#c9a0ff",
       "motif": "origins",
       "title": "The cradle of humanity",
       "facts": [
@@ -52,7 +52,7 @@
       "id": "nile",
       "era": "Ancient kingdoms",
       "year": "3100 BCE to 700 CE",
-      "accent": "#e8a33a",
+      "accent": "#e2a4ff",
       "motif": "pyramids",
       "title": "Egypt, Kush and Aksum",
       "facts": [
@@ -90,7 +90,7 @@
       "id": "bantu",
       "era": "Iron and migration",
       "year": "1000 BCE to 500 CE",
-      "accent": "#d97b3f",
+      "accent": "#ff8fd8",
       "motif": "arrows",
       "title": "Iron, art and the Bantu expansion",
       "facts": [
@@ -166,7 +166,7 @@
       "id": "kingdoms",
       "era": "A continent of states",
       "year": "1000 to 1800 CE",
-      "accent": "#5bc0be",
+      "accent": "#a78bfa",
       "motif": "pins",
       "title": "Swahili, Zimbabwe, Ethiopia, Benin",
       "facts": [
@@ -217,7 +217,7 @@
       "id": "slavery",
       "era": "A darkness",
       "year": "1500s to 1800s",
-      "accent": "#8b2f3f",
+      "accent": "#7a2f6a",
       "motif": "ships",
       "mood": "calm",
       "title": "The Atlantic slave trade",
@@ -263,7 +263,7 @@
       "id": "scramble",
       "era": "Colonial rule",
       "year": "1884 to 1914",
-      "accent": "#9aa5b8",
+      "accent": "#a39bc2",
       "motif": "borders",
       "mood": "calm",
       "title": "The Scramble for Africa",
@@ -295,7 +295,7 @@
       "id": "independence",
       "era": "Independence",
       "year": "1957 to 1994",
-      "accent": "#3cb371",
+      "accent": "#d65cff",
       "motif": "bursts",
       "title": "Africa fights back",
       "facts": [
@@ -343,7 +343,7 @@
       "id": "today",
       "era": "Now",
       "year": "Today",
-      "accent": "#f2b134",
+      "accent": "#b388ff",
       "motif": "network",
       "title": "The story continues",
       "facts": [

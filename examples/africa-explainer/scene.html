@@ -8,12 +8,12 @@
 <script src="map.js"></script>
 <script src="timeline.js"></script>
 <style>
-  :root { --bg0:#0b1020; --bg1:#161c38; --ink:#f5f1e8; --muted:#aab2c8; --accent:#f2b134; }
+  :root { --bg0:#10081f; --bg1:#2b1557; --ink:#f8f2ff; --muted:#c3b5e3; --accent:#b388ff; }
   * { box-sizing:border-box; margin:0; padding:0; }
   html, body { width:1920px; height:1080px; overflow:hidden; background:var(--bg0); font-family:"Inter","DejaVu Sans",system-ui,sans-serif; color:var(--ink); }
-  #stage { position:relative; width:1920px; height:1080px; background:radial-gradient(1400px 900px at 70% 40%, var(--bg1), var(--bg0) 70%); overflow:hidden; }
+  #stage { position:relative; width:1920px; height:1080px; background:radial-gradient(1400px 900px at 70% 40%, var(--bg1), var(--bg0) 70%), linear-gradient(135deg, #1a0b3a, #0d0618); overflow:hidden; }
   #particles { position:absolute; inset:0; }
-  #particles i { position:absolute; width:4px; height:4px; border-radius:50%; background:var(--accent); opacity:.35; }
+  #particles i { position:absolute; width:4px; height:4px; border-radius:50%; background:#d9c4ff; box-shadow:0 0 8px #b388ff; opacity:.35; }
   .scene { position:absolute; inset:0; opacity:0; }
   .copy { position:absolute; left:110px; top:150px; width:820px; }
   .era { font-size:26px; letter-spacing:.28em; text-transform:uppercase; color:var(--accent); font-weight:700; }
@@ -24,15 +24,15 @@
   .facts li::before { content:""; flex:0 0 14px; width:14px; height:14px; margin-top:16px; border-radius:50%; background:var(--accent); box-shadow:0 0 18px var(--accent); }
   .mapwrap { position:absolute; left:960px; top:30px; width:940px; height:940px; }
   svg.map { width:100%; height:100%; overflow:visible; }
-  .country { fill:#1c2644; stroke:#3b4a76; stroke-width:1.2; }
+  .country { fill:#2a1a4e; stroke:#5a3f8f; stroke-width:1.2; }
   .country.hi { stroke:#ffffff55; }
   .pin circle.dot { fill:#fff; }
   .pin circle.ring { fill:none; stroke:#fff; stroke-width:2; }
-  .pin text { font-family:"Inter","DejaVu Sans",sans-serif; font-size:22px; font-weight:700; fill:#fff; paint-order:stroke; stroke:#0b1020; stroke-width:6px; stroke-linejoin:round; }
+  .pin text { font-family:"Inter","DejaVu Sans",sans-serif; font-size:22px; font-weight:700; fill:#fff; paint-order:stroke; stroke:#10081f; stroke-width:6px; stroke-linejoin:round; }
   #timeline { position:absolute; left:160px; right:160px; bottom:70px; height:60px; }
-  #timeline .bar { position:absolute; left:0; right:0; top:28px; height:3px; background:#2a3356; }
+  #timeline .bar { position:absolute; left:0; right:0; top:28px; height:3px; background:#3b2a66; }
   #timeline .fill { position:absolute; left:0; top:28px; height:3px; background:var(--accent); box-shadow:0 0 12px var(--accent); }
-  #timeline .tick { position:absolute; top:22px; width:14px; height:14px; margin-left:-7px; border-radius:50%; background:#2a3356; border:2px solid #3b4a76; }
+  #timeline .tick { position:absolute; top:22px; width:14px; height:14px; margin-left:-7px; border-radius:50%; background:#3b2a66; border:2px solid #5a3f8f; }
   #timeline .tick.on { background:var(--accent); border-color:var(--accent); box-shadow:0 0 14px var(--accent); }
   #timeline .lbl { position:absolute; top:50px; transform:translateX(-50%); font-size:18px; color:var(--muted); white-space:nowrap; letter-spacing:.04em; }
   #timeline .lbl.on { color:var(--ink); font-weight:700; }
@@ -41,12 +41,14 @@
   .counter small { display:block; font-family:"Inter","DejaVu Sans",sans-serif; font-weight:500; font-size:30px; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; margin-top:6px; }
   #counters { position:absolute; left:110px; top:560px; display:flex; gap:120px; }
   .motif { position:absolute; inset:0; pointer-events:none; }
-  #vignette { position:absolute; inset:0; background:radial-gradient(1200px 800px at 50% 50%, transparent 55%, rgba(0,0,0,.55)); pointer-events:none; }
+  #vignette { position:absolute; inset:0; background:radial-gradient(1200px 800px at 50% 50%, transparent 55%, rgba(8,2,20,.6)); pointer-events:none; }
+  #glow { position:absolute; left:-200px; top:-200px; width:900px; height:900px; border-radius:50%; background:radial-gradient(circle, rgba(157,92,255,.28), transparent 60%); pointer-events:none; }
+  #glow2 { position:absolute; right:-250px; bottom:-300px; width:1000px; height:1000px; border-radius:50%; background:radial-gradient(circle, rgba(255,120,220,.16), transparent 60%); pointer-events:none; }
 </style>
 </head>
 <body>
 <div id="stage">
-  <div id="particles"></div>
+  <div id="glow"></div><div id="glow2"></div><div id="particles"></div>
   <div id="scenes"></div>
   <div id="timeline"></div>
   <div id="brand">AdwenTTS · Explainer</div>
@@ -272,7 +274,7 @@ window.render = function (t) {
         const wave = .5 + .5 * Math.sin(lt * 1.5 + (A.countries[iso].cx + A.countries[iso].cy) / 120);
         el.style.fill = s.accent; el.style.fillOpacity = (.08 + .22 * wave).toFixed(3);
       } else if (s.motif === 'borders' && lt > 2.5) {
-        el.style.fill = '#6a7390'; el.style.fillOpacity = (.15 + .35 * easeOut((lt - 2.5) / 2)).toFixed(3);
+        el.style.fill = '#8d84b0'; el.style.fillOpacity = (.15 + .35 * easeOut((lt - 2.5) / 2)).toFixed(3);
       } else { el.style.fill = ''; el.style.fillOpacity = ''; el.style.filter = ''; }
     }
     sc.pins.forEach((pin, i) => {
