@@ -20,6 +20,8 @@ SR = 44_100
 LEAD = 0.7        # seconds of visuals before the voice starts in each scene
 TAIL = 0.9        # seconds after the voice ends
 INTRO_PAD = 0.5
+MUSIC_BED_DB = -17.0   # music gain in the gaps between sentences
+MUSIC_DUCK_DB = -8.0   # extra reduction while the voice is speaking (-23 dB total)
 
 
 def load_voice(scene_id: str) -> tuple[np.ndarray | None, float]:
@@ -39,6 +41,7 @@ def load_voice(scene_id: str) -> tuple[np.ndarray | None, float]:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--render", action="store_true", help="capture frames and mux the mp4")
+    ap.add_argument("--remux", action="store_true", help="only replace the audio in the existing mp4")
     ap.add_argument("--fps", type=int, default=30)
     ap.add_argument("--out", default="out/africa_in_3_minutes.mp4")
     args = ap.parse_args()
@@ -71,9 +74,9 @@ def main() -> None:
             continue
         i = int(start * SR)
         voice[i : i + len(clip)] += clip[: n - i]
-    # voice level: peak-normalise to -3 dBFS
+    # voice level: peak-normalise to -1 dBFS
     if np.max(np.abs(voice)) > 0:
-        voice *= 10 ** (-3 / 20) / np.max(np.abs(voice))
+        voice *= 10 ** (-1 / 20) / np.max(np.abs(voice))
 
     music_dir = HERE / "music"
     full, _ = sf.read(music_dir / "full.wav", dtype="float32")
@@ -101,7 +104,7 @@ def main() -> None:
     env = np.convolve(env, np.ones(win) / win, mode="same")
     env = env / (env.max() + 1e-9)
     gate = np.clip(env * 12, 0, 1)
-    duck_db = -9.0 + (-5.0) * gate  # -9 dB bed, -14 dB under voice
+    duck_db = MUSIC_BED_DB + MUSIC_DUCK_DB * gate
     music *= 10 ** (duck_db / 20)
     # fade out at the end
     fo = int(2.5 * SR)
@@ -116,16 +119,27 @@ def main() -> None:
     sf.write(out_dir / "mix.wav", mix[:end], SR, subtype="PCM_16")
     print(f"audio: {end / SR:.1f}s mixed to out/mix.wav")
 
-    if not args.render:
-        return
     out = HERE / args.out
     out.parent.mkdir(exist_ok=True)
-    subprocess.run(
-        ["node", str(HERE / "capture.mjs"), str(out), str(out_dir / "mix.wav"), str(args.fps)],
-        cwd=HERE,
-        check=True,
-    )
-    print(f"video: {out}")
+    if args.remux:
+        tmp = out.with_name(out.stem + ".remux.mp4")
+        subprocess.run(
+            ["ffmpeg", "-y", "-loglevel", "error", "-i", str(out), "-i", str(out_dir / "mix.wav"),
+             "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k",
+             "-shortest", "-movflags", "+faststart", str(tmp)],
+            check=True,
+        )
+        tmp.replace(out)
+        print(f"remuxed audio into {out}")
+    elif not args.render:
+        return
+    if args.render:
+        subprocess.run(
+            ["node", str(HERE / "capture.mjs"), str(out), str(out_dir / "mix.wav"), str(args.fps)],
+            cwd=HERE,
+            check=True,
+        )
+        print(f"video: {out}")
     # compressed 720p copy for sharing (chat/email limits)
     web = out.with_name(out.stem + "_720p.mp4")
     subprocess.run(
