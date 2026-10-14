@@ -148,11 +148,11 @@ function drawMotif(sc, lt, p) {
       const [a, c, b] = r.map(([lo, la]) => off(...projUnits(lo, la)));
       const d = `M${a[0]} ${a[1]} Q${c[0]} ${c[1]} ${b[0]} ${b[1]}`;
       const k = easeInOut((lt - .6 - i * .35) / 1.6);
-      html += `<path d="${d}" fill="none" stroke="${accent}" stroke-width="8" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${1 - k}" opacity=".95"/>`;
+      html += `<path d="${d}" fill="none" stroke="#fff1d6" stroke-width="8" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${1 - k}" opacity=".95"/>`;
       if (k > .97) {
         const ang = Math.atan2(b[1] - c[1], b[0] - c[0]);
         const tip = (dx, dy) => `${b[0] + Math.cos(ang + dx) * dy},${b[1] + Math.sin(ang + dx) * dy}`;
-        html += `<polygon points="${tip(0, 18)} ${tip(2.5, 22)} ${tip(-2.5, 22)}" fill="${accent}"/>`;
+        html += `<polygon points="${tip(0, 18)} ${tip(2.5, 22)} ${tip(-2.5, 22)}" fill="#fff1d6"/>`;
       }
     });
   } else if (s.motif === 'caravan') {
