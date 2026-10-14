@@ -6,3 +6,18 @@ coverage/
 !.env.example
 *.log
 .DS_Store
+
+# Python worker
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+worker/voices/
+
+# generated audio
+*.wav
+*.mp3
+*.flac
+!worker/tests/fixtures/*.wav

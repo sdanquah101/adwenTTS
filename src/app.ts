@@ -1,6 +1,7 @@
 import Fastify, { type FastifyInstance, type FastifyServerOptions } from "fastify";
 import type { Env } from "./config/env.js";
 import { healthRoutes } from "./routes/health.js";
+import { ttsRoutes } from "./routes/tts.js";
 
 type LoggerOption = NonNullable<FastifyServerOptions["logger"]>;
 
@@ -15,6 +16,7 @@ export function buildApp({ env, logger }: BuildAppOptions): FastifyInstance {
   const app = Fastify({ logger: logger ?? loggerOptions(env) });
 
   app.register(healthRoutes);
+  app.register(ttsRoutes, { inferenceUrl: env.INFERENCE_URL });
 
   return app;
 }
