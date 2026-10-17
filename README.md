@@ -10,6 +10,12 @@ Two parts:
 | Inference worker | [`worker/`](worker/README.md) | Python. Runs the TTS model (Chatterbox, MIT) with a REST API, CLI and web UI. Needs a GPU for real synthesis; a mock engine runs anywhere. |
 | API              | `src/`                        | TypeScript + [Fastify](https://fastify.dev). Health endpoints and a proxy in front of the worker.                                          |
 
+## Adwen Maths: adaptive BECE lessons
+
+[`learn/`](learn/README.md) is the first product built on AdwenTTS: adaptive JHS mathematics
+for BECE. A short check finds the real gap, then narrated micro-lessons and questions are
+planned around the student. It builds to one offline HTML file.
+
 ## Giving it to an AI model
 
 The worker exposes a REST API, an OpenAI-compatible speech endpoint and an MCP server, all
