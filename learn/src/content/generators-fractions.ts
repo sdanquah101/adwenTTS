@@ -91,6 +91,20 @@ const fracSimplify: Gen = (rng) => {
   };
 };
 
+/** Draw (a, b) until the pair is acceptable, e.g. a percentage and an amount giving a whole answer. */
+function pickPair(
+  rng: Rng,
+  xs: readonly number[],
+  ys: readonly number[],
+  ok: (a: number, b: number) => boolean,
+): [number, number] {
+  for (;;) {
+    const a = rng.pick(xs);
+    const b = rng.pick(ys);
+    if (ok(a, b)) return [a, b];
+  }
+}
+
 const DENS = [2, 3, 4, 5, 6, 8, 9, 10, 12] as const;
 
 function twoFractions(rng: Rng): { a: number; b: number; c: number; d: number; L: number } {
@@ -343,12 +357,7 @@ const PCTS = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 75, 80];
 const AMOUNTS = [40, 60, 80, 120, 160, 200, 240, 300, 400, 500, 600, 800];
 
 const pctOf: Gen = (rng) => {
-  let p = 0;
-  let A = 0;
-  do {
-    p = rng.pick(PCTS);
-    A = rng.pick(AMOUNTS);
-  } while ((p * A) % 100 !== 0);
+  const [p, A] = pickPair(rng, PCTS, AMOUNTS, (a, b) => (a * b) % 100 === 0);
   const res = (p * A) / 100;
   const solution = [`${p}% of ${A} = ${p}/100 × ${A}`, `= ${res}`];
   const check = { kind: "pct-of" as const, p, amount: A };
@@ -407,12 +416,7 @@ const pctChange: Gen = (rng) => {
   const item = rng.pick(ITEMS);
   const form = rng.int(0, 2);
   if (form < 2) {
-    let P = 0;
-    let r = 0;
-    do {
-      P = rng.pick(PRICES);
-      r = rng.pick([10, 20, 25, 30, 40, 50]);
-    } while ((P * r) % 100 !== 0);
+    const [P, r] = pickPair(rng, PRICES, [10, 20, 25, 30, 40, 50], (a, b) => (a * b) % 100 === 0);
     const part = (P * r) / 100;
     if (form === 0) {
       const res = P - part;
@@ -456,12 +460,12 @@ const pctChange: Gen = (rng) => {
     };
   }
   const up = rng.chance(0.5);
-  let P = 0;
-  let r = 0;
-  do {
-    P = rng.pick([20, 40, 50, 80, 100, 120, 160, 200, 240, 400]);
-    r = up ? rng.pick([25, 60, 100]) : rng.pick([20, 50, 60, 75]);
-  } while ((P * r) % 100 !== 0);
+  const [P, r] = pickPair(
+    rng,
+    [20, 40, 50, 80, 100, 120, 160, 200, 240, 400],
+    up ? [25, 60, 100] : [20, 50, 60, 75],
+    (a, b) => (a * b) % 100 === 0,
+  );
   const N = up ? (P * (100 + r)) / 100 : (P * (100 - r)) / 100;
   const diff = Math.abs(N - P);
   const trade = rng.chance(0.5);

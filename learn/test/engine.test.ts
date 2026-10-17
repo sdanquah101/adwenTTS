@@ -164,8 +164,10 @@ describe("fraction visuals", () => {
               );
           }
         }
-        if (sc.type === "grid100")
-          (expect(sc.shaded).toBeGreaterThan(0), expect(sc.shaded).toBeLessThanOrEqual(100));
+        if (sc.type === "grid100") {
+          expect(sc.shaded).toBeGreaterThan(0);
+          expect(sc.shaded).toBeLessThanOrEqual(100);
+        }
       }
     expect(barsSeen).toBeGreaterThan(0);
   });

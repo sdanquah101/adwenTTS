@@ -11,7 +11,7 @@ import {
   startDiagnostic,
   type DiagnosticState,
 } from "../engine/diagnostic";
-import { buildPlan, nextUp, type Plan } from "../engine/planner";
+import { nextUp, type Plan } from "../engine/planner";
 import { randomSeed } from "../engine/rng";
 import type { AccentId, Level, Profile, VoicePref } from "../state";
 import { feedback, meter, questionCard, stat, stateChip, STATE_LABEL } from "./components";
