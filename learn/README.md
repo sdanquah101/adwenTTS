@@ -4,20 +4,20 @@ Adaptive BECE mathematics for JHS students. A short check finds the skill that i
 holding a student back, then plays short narrated lessons planned around them, with questions
 after each lesson in the same viewer.
 
-This first slice covers the linear-equations strand and the skills it depends on.
+Two strands so far: linear equations, with the negative-number and algebra skills underneath, and fractions and percentages.
 
 ## How it works
 
-| Part                | What it does                                                                               | Where                                        |
-| ------------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------- |
-| Skill map           | Ten skills with prerequisites, from negative numbers up to word problems                   | `src/content/skills.ts`                      |
-| Question generators | Unlimited BECE-style A to D questions. Every wrong option comes from a named mistake       | `src/content/generators.ts`                  |
-| Mistake catalogue   | 23 common mistakes, each with a plain-language explanation, a fix and its root skill       | `src/content/misconceptions.ts`              |
-| Diagnostic          | Starts at the chosen topic and walks down the prerequisites only where answers go wrong    | `src/engine/diagnostic.ts`                   |
-| Knowledge tracing   | One probability per skill, updated after every answer                                      | `src/engine/bkt.ts`                          |
-| Planner             | Foundations first. Adds short fix lessons for the mistakes the student made                | `src/engine/planner.ts`                      |
-| Lessons             | Narrated micro-lessons: balance scales, number lines, algebra tiles, worked steps          | `src/content/lessons.ts`, `src/ui/scenes.ts` |
-| Profile             | Skill map, mistake patterns, pace and comfort settings, for the student, parent or teacher | `src/ui/screens.ts`                          |
+| Part                | What it does                                                                                                                | Where                                                  |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| Skill map           | Sixteen skills with prerequisites, from negative numbers to word problems and from simplifying fractions to profit and loss | `src/content/skills.ts`                                |
+| Question generators | Unlimited BECE-style A to D questions. Every wrong option comes from a named mistake                                        | `src/content/generators.ts`, `generators-fractions.ts` |
+| Mistake catalogue   | 44 common mistakes, each with a plain-language explanation, a fix and its root skill                                        | `src/content/misconceptions.ts`                        |
+| Diagnostic          | Starts at the chosen topic and walks down the prerequisites only where answers go wrong                                     | `src/engine/diagnostic.ts`                             |
+| Knowledge tracing   | One probability per skill, updated after every answer                                                                       | `src/engine/bkt.ts`                                    |
+| Planner             | Foundations first. Adds short fix lessons for the mistakes the student made                                                 | `src/engine/planner.ts`                                |
+| Lessons             | Narrated micro-lessons: balance scales, number lines, algebra tiles, fraction bars, hundred squares, worked steps           | `src/content/lessons.ts`, `src/ui/scenes.ts`           |
+| Profile             | Skill map, mistake patterns, pace and comfort settings, for the student, parent or teacher                                  | `src/ui/screens.ts`                                    |
 
 Comfort preferences such as colour, narrator voice and reading support make the app pleasant
 to use. Lesson choice is driven by the student's answers, not by those preferences.
@@ -28,8 +28,8 @@ All data stays on the device in `localStorage`.
 
 ```sh
 pnpm install
-pnpm build        # dist/adwen-maths.html: one offline file, about 110 KB
-pnpm test         # checks 5,000 generated questions against an independent solver
+pnpm build        # dist/adwen-maths.html: one offline file, about 150 KB
+pnpm test         # checks 8,000 generated questions against an independent solver
 pnpm typecheck
 ```
 
