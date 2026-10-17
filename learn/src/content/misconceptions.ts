@@ -56,8 +56,6 @@ export interface Misconception {
   fix: string;
   /** Skill where this mistake really lives (may be lower than where it showed up). */
   root: SkillId;
-  /** Short lesson that targets this mistake, if one exists. */
-  lesson?: string;
 }
 
 const M = (m: Misconception) => m;
@@ -90,7 +88,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You treated “minus a negative” as a plain minus.",
     fix: "Minus a negative becomes plus: 5 − (−3) = 5 + 3 = 8.",
     root: "int-add",
-    lesson: "fix-minus-negative",
   }),
   "int-sign-rule": M({
     id: "int-sign-rule",
@@ -98,7 +95,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You used the wrong sign rule for multiplying or dividing.",
     fix: "Same signs give a positive answer. Different signs give a negative answer.",
     root: "int-mul",
-    lesson: "fix-sign-rule",
   }),
   "int-wrong-operation": M({
     id: "int-wrong-operation",
@@ -113,7 +109,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You added the x terms and the plain numbers into one term.",
     fix: "x terms and plain numbers are different kinds. They stay separate.",
     root: "like-terms",
-    lesson: "fix-unlike-terms",
   }),
   "alg-sign-error": M({
     id: "alg-sign-error",
@@ -128,7 +123,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You turned adding x terms into x².",
     fix: "x + x = 2x. You only get x² from x × x.",
     root: "like-terms",
-    lesson: "fix-unlike-terms",
   }),
   "alg-partial-distribute": M({
     id: "alg-partial-distribute",
@@ -136,7 +130,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You multiplied only the first term inside the bracket.",
     fix: "The number outside multiplies every term inside the bracket.",
     root: "expand",
-    lesson: "fix-partial-distribute",
   }),
   "alg-add-instead": M({
     id: "alg-add-instead",
@@ -144,7 +137,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You added the number outside the bracket instead of multiplying.",
     fix: "A number written next to a bracket means multiply.",
     root: "expand",
-    lesson: "fix-partial-distribute",
   }),
   "eq-same-operation": M({
     id: "eq-same-operation",
@@ -152,7 +144,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You did the same operation again instead of the opposite one.",
     fix: "Undo + with −, − with +, × with ÷ and ÷ with ×.",
     root: "eq-one-step",
-    lesson: "fix-opposite-operation",
   }),
   "eq-wrong-inverse": M({
     id: "eq-wrong-inverse",
@@ -160,7 +151,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You used the wrong opposite operation.",
     fix: "The opposite of × is ÷. The opposite of + is −.",
     root: "eq-one-step",
-    lesson: "fix-opposite-operation",
   }),
   "eq-order-of-undoing": M({
     id: "eq-order-of-undoing",
@@ -168,7 +158,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You divided before removing the number that was added or subtracted.",
     fix: "Remove the added or subtracted number first, then divide.",
     root: "eq-two-step",
-    lesson: "fix-undo-order",
   }),
   "eq-sign-error": M({
     id: "eq-sign-error",
@@ -190,7 +179,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You moved a term across the equals sign without changing its sign.",
     fix: "Subtract it from both sides instead of moving it. Then the sign takes care of itself.",
     root: "eq-both-sides",
-    lesson: "fix-move-sign",
   }),
   "eq-ignore-term": M({
     id: "eq-ignore-term",
@@ -205,7 +193,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You divided when you needed to multiply.",
     fix: "x ÷ 4 is undone by × 4.",
     root: "eq-fractions",
-    lesson: "fix-clear-fraction",
   }),
   "eq-multiply-one-term": M({
     id: "eq-multiply-one-term",
@@ -213,7 +200,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You multiplied only part of the equation.",
     fix: "When you multiply, multiply every term on both sides.",
     root: "eq-fractions",
-    lesson: "fix-clear-fraction",
   }),
   "word-wrong-unknown": M({
     id: "word-wrong-unknown",
@@ -221,7 +207,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You found the other person’s value instead of the one the question asked for.",
     fix: "Read the last line again: who or what is the question asking about?",
     root: "eq-word",
-    lesson: "fix-answer-the-question",
   }),
   "word-incomplete": M({
     id: "word-incomplete",
@@ -229,7 +214,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You stopped one step before the end.",
     fix: "Check that your answer is the quantity the question asks for.",
     root: "eq-word",
-    lesson: "fix-answer-the-question",
   }),
   "word-ignored-difference": M({
     id: "word-ignored-difference",
@@ -272,7 +256,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You added the bottom numbers as well as the tops.",
     fix: "Make the bottoms the same, then add only the tops. The bottom stays the same.",
     root: "frac-add",
-    lesson: "fix-add-across",
   }),
   "frac-numerators-unchanged": M({
     id: "frac-numerators-unchanged",
@@ -280,7 +263,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You changed the bottom numbers but not the tops.",
     fix: "If the bottom is multiplied by a number, multiply the top by the same number.",
     root: "frac-add",
-    lesson: "fix-numerators-unchanged",
   }),
   "frac-forgot-carry": M({
     id: "frac-forgot-carry",
@@ -309,7 +291,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You multiplied without flipping the second fraction.",
     fix: "Keep the first fraction, change ÷ to ×, and flip the second fraction.",
     root: "frac-mul",
-    lesson: "fix-keep-change-flip",
   }),
   "frac-flip-wrong-one": M({
     id: "frac-flip-wrong-one",
@@ -317,7 +298,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You flipped the first fraction instead of the second.",
     fix: "Keep the first fraction as it is. Flip only the one you are dividing by.",
     root: "frac-mul",
-    lesson: "fix-keep-change-flip",
   }),
   "frac-of-incomplete": M({
     id: "frac-of-incomplete",
@@ -332,7 +312,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You forgot that percent means out of 100.",
     fix: "To make a percentage, multiply by 100. To use a percentage, divide by 100.",
     root: "frac-dec-pct",
-    lesson: "fix-percent-hundred",
   }),
   "pct-place-value": M({
     id: "pct-place-value",
@@ -340,7 +319,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You moved the decimal point the wrong number of places.",
     fix: "× 100 moves the point two places to the right. ÷ 100 moves it two places to the left.",
     root: "frac-dec-pct",
-    lesson: "fix-percent-hundred",
   }),
   "pct-digits-as-percent": M({
     id: "pct-digits-as-percent",
@@ -355,7 +333,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You wrote the percentage over 10 instead of over 100.",
     fix: "Percent means out of 100: 40% = 40/100.",
     root: "frac-dec-pct",
-    lesson: "fix-percent-hundred",
   }),
   "pct-wrong-part": M({
     id: "pct-wrong-part",
@@ -363,7 +340,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You found the other part: the discount instead of the new price, or the rest instead of the part asked for.",
     fix: "Read the last sentence again. Which amount is it asking for?",
     root: "pct-of",
-    lesson: "fix-which-amount",
   }),
   "pct-percent-as-amount": M({
     id: "pct-percent-as-amount",
@@ -385,7 +361,6 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You divided by the new amount instead of the original amount.",
     fix: "Percentage change = change ÷ original amount × 100.",
     root: "pct-change",
-    lesson: "fix-original-amount",
   }),
   "pct-ratio-not-change": M({
     id: "pct-ratio-not-change",
@@ -393,6 +368,5 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You worked out the new amount as a percentage of the old one, not the change.",
     fix: "Subtract first to find the change, then divide by the original amount.",
     root: "pct-change",
-    lesson: "fix-original-amount",
   }),
 };

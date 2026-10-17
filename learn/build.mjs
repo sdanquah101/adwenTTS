@@ -1,13 +1,11 @@
 // Bundles the app into one HTML file that works offline:
-//   dist/index.html        page fragment (for hosts that add their own <html>/<head>, such as Claude Artifacts)
+//   dist/index.html        page fragment for claude.ai, where videos are written and narrated on the spot
 //   dist/adwen-maths.html  complete standalone document (open directly, or share the file)
-//   dist/narration.json    every narration line, for pre-generating audio with AdwenTTS
 //   dist/app/              installable web app (manifest, icons, offline service worker); deploy this folder
 import * as esbuild from "esbuild";
 import { createHash } from "node:crypto";
 import {
   copyFileSync,
-  cpSync,
   existsSync,
   mkdirSync,
   readdirSync,
@@ -16,7 +14,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { dirname, join } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const dist = join(here, "dist");
@@ -45,33 +43,12 @@ function accentCss() {
   return `${light}@media (prefers-color-scheme: dark){\n${darkMedia}}\n${darkAttr}`;
 }
 
-async function narration() {
-  const out = join(dist, ".narration.mjs");
-  await esbuild.build({
-    stdin: {
-      contents: 'export { narrationLines } from "./src/content/lessons.ts";',
-      resolveDir: here,
-      loader: "ts",
-    },
-    bundle: true,
-    format: "esm",
-    platform: "node",
-    outfile: out,
-    logLevel: "error",
-  });
-  const mod = await import(`${pathToFileURL(out).href}?t=${Date.now()}`);
-  writeFileSync(join(dist, "narration.json"), JSON.stringify(mod.narrationLines(), null, 1));
-}
-
 function page(js) {
   const css = readFileSync(join(here, "src/styles.css"), "utf8").replace(
     "/*ACCENTS*/",
     accentCss(),
   );
-  let tpl = readFileSync(join(here, "src/page.html"), "utf8");
-  // Narration clips from AdwenTTS are optional; flag them only when they exist.
-  if (existsSync(join(dist, "audio", "manifest.json")))
-    tpl = tpl.replace("<title>", '<meta name="adwen-audio" content="1">\n<title>');
+  const tpl = readFileSync(join(here, "src/page.html"), "utf8");
   // Avoid "</script>" inside the bundle ending the tag early.
   const safeJs = js.replace(/<\/script/gi, "<\\/script");
   return tpl.replace("/*CSS*/", () => css).replace("/*JS*/", () => safeJs);
@@ -117,13 +94,13 @@ function writeSite(standalone) {
 
   const shots = [
     ["screen-home.png", "Topics and your learning path"],
-    ["screen-path.png", "A learning path planned from a short check"],
+    ["screen-path.png", "A video series planned from a short check"],
   ].filter(([f]) => icons.includes(f));
   const manifest = {
     name: "Adwen Maths",
     short_name: "Adwen Maths",
     description:
-      "Adaptive BECE mathematics: a short check finds the real gap, then narrated lessons and questions are planned around you.",
+      "Adaptive BECE mathematics: a short check finds the real gap, then a series of explainer videos is written for you.",
     lang: "en-GB",
     start_url: "./",
     scope: "./",
@@ -146,10 +123,6 @@ function writeSite(standalone) {
     })),
   };
   writeFileSync(join(site, "manifest.webmanifest"), JSON.stringify(manifest, null, 2));
-
-  // Narration clips, when generated, ship with the site and are cached as they are played.
-  if (existsSync(join(dist, "audio")))
-    cpSync(join(dist, "audio"), join(site, "audio"), { recursive: true });
 
   const shell = [
     "./",
@@ -207,7 +180,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Icons, narration clips and fonts: saved after first use, so they cost data only once.
+  // Icons and fonts: saved after first use, so they cost data only once.
   const sameOrigin = url.origin === self.location.origin;
   const fonts = url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com";
   if (!sameOrigin && !fonts) return;
@@ -240,7 +213,6 @@ const options = {
 };
 
 mkdirSync(dist, { recursive: true });
-await narration();
 if (watch) {
   const ctx = await esbuild.context({
     ...options,

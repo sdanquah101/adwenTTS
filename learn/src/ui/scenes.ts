@@ -1,4 +1,11 @@
-import type { BalanceAction, Pan, Scene, Tile } from "../content/lessons";
+import {
+  ICONS,
+  type BalanceAction,
+  type IconName,
+  type Pan,
+  type Tile,
+  type Visual,
+} from "../gen/script";
 import { fmtInt } from "../math/format";
 import { h, math, mathHTML, reducedMotion, s } from "./dom";
 
@@ -9,6 +16,8 @@ export interface SceneView {
   /** Jump to the final state (skip, or reduced motion). */
   finish(): void;
   stop(): void;
+  /** Think scenes only: show the answer after the student has tried. */
+  reveal?(): void;
 }
 
 class Timeline {
@@ -52,10 +61,18 @@ function view(
 
 const show = (el: Element) => el.classList.add("in");
 
-export function renderScene(scene: Scene): SceneView {
+export function renderScene(scene: Visual): SceneView {
   switch (scene.type) {
-    case "intro":
+    case "title":
       return intro(scene.kicker, scene.title);
+    case "story":
+      return story(scene.icon, scene.title, scene.lines);
+    case "mapping":
+      return mapping(scene.title, scene.pairs);
+    case "quote":
+      return quote(scene.text);
+    case "think":
+      return think(scene.question, scene.math, scene.answer, scene.hint);
     case "steps":
       return steps(scene.lines);
     case "balance":
@@ -595,4 +612,104 @@ function grid100(mathText: string, shaded: number, result: string): SceneView {
     fill(shaded);
     show(res);
   });
+}
+
+// ---------- analogy, mapping, key line, pause-and-try ----------
+
+function story(icon: IconName, title: string, lines: string[]): SceneView {
+  const ic = h("span", { class: "story-icon reveal", "aria-hidden": "true" }, ICONS[icon]);
+  const t = h("h2", { class: "story-title reveal" }, title);
+  const ls = lines.map((l) => h("p", { class: "story-line reveal" }, l));
+  const el = h("div", { class: "scene sc-story" }, ic, t, h("div", { class: "story-lines" }, ls));
+  return view(
+    el,
+    [
+      { at: 0.02, run: () => show(ic) },
+      { at: 0.08, run: () => show(t) },
+      ...ls.map((l, i) => ({ at: 0.2 + (0.6 * i) / Math.max(1, ls.length), run: () => show(l) })),
+    ],
+    () => [ic, t, ...ls].forEach(show),
+  );
+}
+
+function mapping(title: string, pairs: { from: string; to: string }[]): SceneView {
+  const t = h("p", { class: "rule-title reveal" }, title);
+  const rows = pairs.map((p) =>
+    h(
+      "li",
+      { class: "map-row" },
+      h("span", { class: "map-from reveal" }, p.from),
+      h(
+        "span",
+        { class: "map-arrow reveal", "aria-label": "means" },
+        s(
+          "svg",
+          { viewBox: "0 0 24 24", "aria-hidden": "true" },
+          s("path", { d: "M4 12h14M13 6l6 6-6 6" }),
+        ),
+      ),
+      h("span", { class: "map-to reveal", html: mathHTML(p.to) }),
+    ),
+  );
+  const el = h("div", { class: "scene sc-mapping" }, t, h("ul", { class: "map-list" }, rows));
+  const cues = [{ at: 0.02, run: () => show(t) }];
+  rows.forEach((r, i) => {
+    const at = 0.12 + (0.7 * i) / Math.max(1, rows.length);
+    const [from, arrow, to] = [...r.children];
+    cues.push({ at, run: () => show(from!) });
+    cues.push({ at: at + 0.06, run: () => show(arrow!) });
+    cues.push({ at: at + 0.12, run: () => show(to!) });
+  });
+  return view(el, cues, () => el.querySelectorAll(".reveal").forEach(show));
+}
+
+function quote(text: string): SceneView {
+  const q = h("p", { class: "quote-text reveal", html: mathHTML(text) });
+  const el = h("div", { class: "scene sc-quote" }, q);
+  return view(el, [{ at: 0.04, run: () => show(q) }], () => show(q));
+}
+
+function think(
+  question: string,
+  mathText: string | undefined,
+  answer: string,
+  hint?: string,
+): SceneView {
+  const k = h("p", { class: "sc-kicker reveal" }, "Your turn");
+  const q = h("p", { class: "think-q reveal" }, question);
+  const m = mathText ? h("p", { class: "sc-bigmath reveal", html: mathHTML(mathText) }) : null;
+  const hintEl = hint ? h("p", { class: "think-hint", hidden: true }, `Hint: ${hint}`) : null;
+  const ans = h(
+    "p",
+    { class: "think-answer", hidden: true },
+    h("span", { class: "think-answer-label" }, "Answer"),
+    h("span", { html: mathHTML(answer) }),
+  );
+  const el = h("div", { class: "scene sc-think" }, k, q, m, hintEl, ans);
+  const v = view(
+    el,
+    [
+      { at: 0.02, run: () => show(k) },
+      { at: 0.08, run: () => show(q) },
+      ...(m ? [{ at: 0.3, run: () => show(m) }] : []),
+    ],
+    () => [k, q, ...(m ? [m] : [])].forEach(show),
+  );
+  return {
+    ...v,
+    reveal() {
+      v.finish();
+      if (hintEl) hintEl.hidden = true;
+      ans.hidden = false;
+      requestAnimationFrame(() => ans.classList.add("in"));
+    },
+  };
+}
+
+/** Shows a think scene's hint, if it has one. Returns false when there is none. */
+export function showHint(el: HTMLElement): boolean {
+  const hint = el.querySelector<HTMLElement>(".think-hint");
+  if (!hint) return false;
+  hint.hidden = false;
+  return true;
 }

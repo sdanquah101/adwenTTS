@@ -1,22 +1,22 @@
-import { lessonsFor } from "./content/lessons";
 import type { SkillId } from "./content/skills";
 import { insights } from "./engine/analytics";
-import { buildPlan } from "./engine/planner";
-import { clear, emptyData, load, save, type AccentId, type Data } from "./state";
+import { loadRemote, onClaude, saveRemote } from "./gen/runtime";
+import { clear, emptyData, load, revive, save, type AccentId, type Data } from "./state";
 import { h } from "./ui/dom";
-import { stopAll, warmUp } from "./ui/narrator";
 import { initPwa } from "./pwa";
 import { sampleStudent } from "./ui/sample";
 import * as screens from "./ui/screens";
+import * as series from "./ui/series";
 
 export type Screen =
   | { name: "welcome" }
   | { name: "onboard" }
   | { name: "home" }
   | { name: "diagnostic"; target: SkillId }
-  | { name: "path" }
-  | { name: "lesson"; step: number }
-  | { name: "done" }
+  | { name: "series" }
+  | { name: "video"; index: number; chapter?: number }
+  | { name: "quiz" }
+  | { name: "results" }
   | { name: "profile" };
 
 export interface App {
@@ -26,7 +26,8 @@ export interface App {
   rate(): number;
   register(): "standard" | "simple";
   setAccent(a: AccentId): void;
-  newPlan(target: SkillId): void;
+  /** Start a new series on a topic; the series screen plans it. */
+  newSeries(target: SkillId): void;
   loadSample(): void;
   reset(): void;
 }
@@ -44,12 +45,13 @@ function boot(): void {
     data: load(),
     go(s) {
       cleanup?.();
-      stopAll();
-      // Screens that need a profile or a plan fall back sensibly.
+      // Screens that need a profile or a series fall back sensibly.
+      const sr = app.data.series;
       if (!app.data.profile && s.name !== "welcome" && s.name !== "onboard")
         s = { name: "welcome" };
-      if ((s.name === "path" || s.name === "lesson" || s.name === "done") && !app.data.plan)
-        s = { name: "home" };
+      if ((s.name === "series" || s.name === "quiz") && !sr) s = { name: "home" };
+      if (s.name === "video" && !sr?.videos[s.index]) s = { name: sr ? "series" : "home" };
+      if (s.name === "results" && !sr?.quiz) s = { name: sr ? "series" : "home" };
       const v =
         s.name === "welcome"
           ? screens.welcome(app)
@@ -59,20 +61,25 @@ function boot(): void {
               ? screens.home(app)
               : s.name === "diagnostic"
                 ? screens.diagnostic(app, s.target)
-                : s.name === "path"
-                  ? screens.path(app)
-                  : s.name === "lesson"
-                    ? screens.lesson(app, s.step)
-                    : s.name === "done"
-                      ? screens.done(app)
-                      : screens.profile(app);
+                : s.name === "series"
+                  ? series.seriesScreen(app)
+                  : s.name === "video"
+                    ? series.videoScreen(app, s.index, s.chapter)
+                    : s.name === "quiz"
+                      ? series.quizScreen(app)
+                      : s.name === "results"
+                        ? series.resultsScreen(app)
+                        : screens.profile(app);
       cleanup = v.cleanup;
       main.replaceChildren(v.el);
       drawChrome(s);
       window.scrollTo({ top: 0 });
       (main.querySelector("h1") as HTMLElement | null)?.setAttribute("tabindex", "-1");
     },
-    commit: () => save(app.data),
+    commit() {
+      save(app.data);
+      if (!app.data.profile?.sample) saveRemote(app.data);
+    },
     rate() {
       const p = app.data.profile;
       const r = (p?.speed ?? 1) * insights(app.data).paceFactor;
@@ -82,15 +89,15 @@ function boot(): void {
     setAccent(a) {
       root.setAttribute("data-accent", a);
     },
-    newPlan(target) {
+    newSeries(target) {
       const d = app.data;
-      d.plan = buildPlan({
+      d.series = {
+        id: `s${Date.now().toString(36)}`,
         target,
-        mastery: d.mastery,
-        misconceptions: d.misconceptions,
-        lessonsFor,
-        style: d.style,
-      });
+        createdAt: Date.now(),
+        intro: "",
+        videos: [],
+      };
       d.planStart = { ...d.mastery };
       app.commit();
     },
@@ -137,15 +144,15 @@ function boot(): void {
                 },
                 "Topics",
               ),
-              app.data.plan
+              app.data.series
                 ? h(
                     "button",
                     {
                       type: "button",
-                      class: `navlink${s.name === "path" ? " on" : ""}`,
-                      onClick: () => app.go({ name: "path" }),
+                      class: `navlink${s.name === "series" || s.name === "video" ? " on" : ""}`,
+                      onClick: () => app.go({ name: "series" }),
                     },
-                    "My path",
+                    "My videos",
                   )
                 : null,
               h(
@@ -185,9 +192,20 @@ function boot(): void {
   }
 
   if (app.data.profile) app.setAccent(app.data.profile.accent);
-  initPwa();
-  warmUp();
+  if (!onClaude()) initPwa();
   app.go({ name: app.data.profile ? "home" : "welcome" });
+  // On claude.ai the record is also kept in the student's private folder; use it when this
+  // browser has nothing saved (a new device, or cleared storage).
+  if (onClaude() && !app.data.profile)
+    void loadRemote().then((raw) => {
+      if (!raw || app.data.profile) return;
+      const d = revive(raw);
+      if (!d.profile) return;
+      app.data = d;
+      save(d);
+      app.setAccent(d.profile.accent);
+      app.go({ name: "home" });
+    });
 }
 
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);

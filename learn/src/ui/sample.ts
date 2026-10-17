@@ -1,12 +1,10 @@
 import { makeItem } from "../content/generators";
-import { lessonsFor } from "../content/lessons";
 import type { SkillId } from "../content/skills";
-import { buildPlan } from "../engine/planner";
 import { emptyData, type Attempt, type Data } from "../state";
 
 /**
  * A realistic example student so a parent, teacher or funder can see the
- * profile and the learning path without taking the diagnostic first.
+ * profile and have a video series written without taking the diagnostic first.
  * Clearly marked as a sample in the interface.
  */
 export function sampleStudent(): Data {
@@ -20,6 +18,7 @@ export function sampleStudent(): Data {
     simpler: false,
     captions: true,
     speed: 1,
+    interests: ["Football", "Buying and selling"],
     sample: true,
     createdAt: now - 3 * 864e5,
   };
@@ -48,27 +47,27 @@ export function sampleStudent(): Data {
     ["int-mul", true, 19],
     ["int-mul", false, 24, "int-sign-rule"],
   ];
-  d.attempts = script.map(([skill, correct, sec, m], i) => ({
-    t: now - 864e5 + i * 60e3,
-    skill,
-    item: makeItem(skill, 1000 + i).id,
-    correct,
-    misconception: m,
-    ms: sec * 1000,
-    ctx: "diagnostic",
-  }));
+  d.attempts = script.map(([skill, correct, sec, m], i) => {
+    const item = makeItem(skill, 1000 + i);
+    // The option this mistake produces, when the generated question has one.
+    const chosen = item.options.find((o) => (m ? o.misconception === m : o.correct === correct));
+    return {
+      t: now - 864e5 + i * 60e3,
+      skill,
+      item: item.id,
+      correct,
+      misconception: m,
+      ms: sec * 1000,
+      ctx: "diagnostic" as const,
+      ...(chosen
+        ? { question: item.math ? `${item.prompt} ${item.math}` : item.prompt, answer: chosen.text }
+        : {}),
+    };
+  });
   for (const a of d.attempts)
     if (a.misconception)
       d.misconceptions[a.misconception] = (d.misconceptions[a.misconception] ?? 0) + 1;
   d.diagnosed = ["eq-both-sides"];
-  d.plan = buildPlan({
-    target: "eq-both-sides",
-    mastery: d.mastery,
-    misconceptions: d.misconceptions,
-    lessonsFor,
-    style: d.style,
-  });
   d.planStart = { ...d.mastery };
-  d.watched = [{ t: now - 864e5, lesson: "int-add-visual", seconds: 74 }];
   return d;
 }

@@ -44,3 +44,12 @@ export function stateOf(p: number | undefined, attempts: number): SkillState {
   if (p >= 0.5) return "learning";
   return "gap";
 }
+
+/** How a state reads in a brief for Claude. */
+export const STATE_WORDS: Record<SkillState, string> = {
+  mastered: "mastered",
+  known: "strong",
+  learning: "partly there",
+  gap: "a gap",
+  untested: "not tested",
+};

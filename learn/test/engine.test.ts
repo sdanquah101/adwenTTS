@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { bktUpdate, DEFAULT_BKT, KNOWN, MASTERED } from "../src/engine/bkt";
 import { isFinished, MAX_QUESTIONS, recordAnswer, startDiagnostic } from "../src/engine/diagnostic";
-import { buildPlan, fixesFor } from "../src/engine/planner";
+import { needsFor } from "../src/engine/planner";
 import { ancestors, SKILLS, topoOrder, type SkillId } from "../src/content/skills";
 
 describe("skill graph", () => {
@@ -69,11 +69,10 @@ describe("adaptive diagnostic", () => {
 });
 
 describe("planner", () => {
-  const lessonsFor = (s: SkillId) => [`${s}-a`, `${s}-b`];
-  it("puts foundations first and skips known skills", () => {
-    const plan = buildPlan({
-      target: "eq-both-sides",
-      mastery: {
+  it("puts unknown foundations first, in prerequisite order, and keeps the closest ones", () => {
+    const needs = needsFor(
+      "eq-both-sides",
+      {
         "int-add": 0.2,
         "int-mul": 0.95,
         "eq-one-step": 0.9,
@@ -81,94 +80,13 @@ describe("planner", () => {
         "like-terms": 0.3,
         "eq-both-sides": 0.2,
       },
-      misconceptions: {},
-      lessonsFor,
-    });
-    expect(plan.steps.map((s) => s.skill)).toEqual([
-      "int-add",
-      "like-terms",
-      "eq-two-step",
-      "eq-both-sides",
-    ]);
+      { "alg-combine-unlike": 2, "frac-flip": 3 },
+    );
+    expect(needs.foundations).toEqual(["int-add", "like-terms", "eq-two-step"]);
+    // A fractions mistake is not on the way to this topic.
+    expect(needs.mistakes.map((m) => m.id)).toEqual(["alg-combine-unlike"]);
   });
-  it("uses the preferred style when a lesson exists for it", () => {
-    const plan = buildPlan({
-      target: "eq-two-step",
-      mastery: {},
-      misconceptions: {},
-      lessonsFor,
-      style: "b",
-    });
-    expect(plan.steps.every((s) => s.lesson.endsWith("-b"))).toBe(true);
-  });
-  it("attaches fixes for mistakes rooted in a skill", () => {
-    expect(fixesFor("int-add", { "int-minus-negative": 2, "eq-sign-error": 5 })).toEqual([
-      "fix-minus-negative",
-    ]);
-  });
-});
-
-import { LESSONS, lessonsFor } from "../src/content/lessons";
-import { MISCONCEPTIONS } from "../src/content/misconceptions";
-
-describe("lessons", () => {
-  it("every skill has a main lesson and every remediation link resolves", () => {
-    for (const s of SKILLS) expect(lessonsFor(s.id).length).toBeGreaterThan(0);
-    const ids = new Set(LESSONS.map((l) => l.id));
-    for (const m of Object.values(MISCONCEPTIONS))
-      if (m.lesson) expect(ids.has(m.lesson), m.lesson).toBe(true);
-  });
-  it("balance scenes stay balanced through every action", () => {
-    for (const l of LESSONS)
-      for (const sc of l.scenes) {
-        if (sc.type !== "balance") continue;
-        let L = { x: sc.left.x ?? 0, u: sc.left.units ?? 0 };
-        let R = { x: sc.right.x ?? 0, u: sc.right.units ?? 0 };
-        for (const a of sc.actions) {
-          if (a.type === "removeUnits") {
-            L.u -= a.n;
-            R.u -= a.n;
-          }
-          if (a.type === "removeX") {
-            L.x -= a.n;
-            R.x -= a.n;
-          }
-          if (a.type === "share") {
-            expect((L.x % a.groups) + (L.u % a.groups) + (R.x % a.groups) + (R.u % a.groups)).toBe(
-              0,
-            );
-            L = { x: L.x / a.groups, u: L.u / a.groups };
-            R = { x: R.x / a.groups, u: R.u / a.groups };
-          }
-          expect(Math.min(L.x, L.u, R.x, R.u)).toBeGreaterThanOrEqual(0);
-        }
-        expect(`x = ${R.u}`).toBe(sc.result);
-        expect(L.x).toBe(1);
-      }
-  });
-});
-
-describe("fraction visuals", () => {
-  it("every fraction bar matches its label and every hundred square is in range", () => {
-    let barsSeen = 0;
-    for (const l of LESSONS)
-      for (const sc of l.scenes) {
-        if (sc.type === "bars") {
-          for (const r of sc.rows) {
-            barsSeen++;
-            expect(r.shaded).toBeLessThanOrEqual(r.parts);
-            const m = /^(\d+)\/(\d+)$/.exec(r.label);
-            if (m)
-              expect(r.shaded / r.parts, `${l.id} ${r.label}`).toBeCloseTo(
-                Number(m[1]) / Number(m[2]),
-              );
-          }
-        }
-        if (sc.type === "grid100") {
-          expect(sc.shaded).toBeGreaterThan(0);
-          expect(sc.shaded).toBeLessThanOrEqual(100);
-        }
-      }
-    expect(barsSeen).toBeGreaterThan(0);
+  it("has no foundations when everything underneath is known", () => {
+    expect(needsFor("int-add", {}, {}).foundations).toEqual([]);
   });
 });
