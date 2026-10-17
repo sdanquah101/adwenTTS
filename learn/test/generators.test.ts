@@ -34,6 +34,35 @@ function expectedKey(check: Check): string {
       expect(l0.mul(x).add(l1).eq(r0.mul(x).add(r1))).toBe(true);
       return x.key();
     }
+    case "simplify": {
+      let a = check.n;
+      let b = check.d;
+      while (b) [a, b] = [b, a % b];
+      return `r:${check.n / a}/${check.d / a}`;
+    }
+    case "missing":
+      return new Q(check.p * check.D, check.q).key();
+    case "frac-op": {
+      const x = new Q(check.a[0], check.a[1]);
+      const y = new Q(check.b[0], check.b[1]);
+      const v =
+        check.op === "+"
+          ? x.add(y)
+          : check.op === "-"
+            ? x.sub(y)
+            : check.op === "*"
+              ? x.mul(y)
+              : x.div(y);
+      return v.key();
+    }
+    case "convert":
+      return check.to === "pct" ? `p:${check.value.mul(100).key()}` : check.value.key();
+    case "pct-of":
+      return new Q(check.p * check.amount, 100).key();
+    case "pct-new":
+      return new Q(check.P * (100 + check.r), 100).key();
+    case "pct-change":
+      return `p:${new Q(Math.abs(check.N - check.P) * 100, check.P).key()}`;
   }
 }
 

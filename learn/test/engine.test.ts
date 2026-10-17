@@ -147,3 +147,26 @@ describe("lessons", () => {
       }
   });
 });
+
+describe("fraction visuals", () => {
+  it("every fraction bar matches its label and every hundred square is in range", () => {
+    let barsSeen = 0;
+    for (const l of LESSONS)
+      for (const sc of l.scenes) {
+        if (sc.type === "bars") {
+          for (const r of sc.rows) {
+            barsSeen++;
+            expect(r.shaded).toBeLessThanOrEqual(r.parts);
+            const m = /^(\d+)\/(\d+)$/.exec(r.label);
+            if (m)
+              expect(r.shaded / r.parts, `${l.id} ${r.label}`).toBeCloseTo(
+                Number(m[1]) / Number(m[2]),
+              );
+          }
+        }
+        if (sc.type === "grid100")
+          (expect(sc.shaded).toBeGreaterThan(0), expect(sc.shaded).toBeLessThanOrEqual(100));
+      }
+    expect(barsSeen).toBeGreaterThan(0);
+  });
+});

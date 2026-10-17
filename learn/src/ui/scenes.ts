@@ -68,6 +68,10 @@ export function renderScene(scene: Scene): SceneView {
       return contrast(scene.wrong, scene.right, scene.why);
     case "rule":
       return rule(scene.title, scene.body);
+    case "bars":
+      return bars(scene.math, scene.rows, scene.result);
+    case "grid100":
+      return grid100(scene.math, scene.shaded, scene.result);
   }
 }
 
@@ -524,4 +528,71 @@ function rule(title: string, body: string[]): SceneView {
     })),
   ];
   return view(el, cues, () => [t, ...lines].forEach(show));
+}
+
+// ---------- fraction bars ----------
+
+function bars(
+  mathText: string,
+  rows: { parts: number; shaded: number; label: string }[],
+  result: string,
+): SceneView {
+  const eq = h("p", { class: "sc-bigmath sc-bars-title", html: mathHTML(mathText) });
+  const rowEls = rows.map((r) =>
+    h(
+      "div",
+      { class: "bar-row reveal" },
+      h("span", { class: "bar-label", html: mathHTML(r.label) }),
+      h(
+        "span",
+        { class: "bar", role: "img", "aria-label": `${r.shaded} of ${r.parts} equal parts shaded` },
+        Array.from({ length: r.parts }, (_, i) =>
+          h("span", { class: i < r.shaded ? "seg on" : "seg" }),
+        ),
+      ),
+    ),
+  );
+  const res = h("p", { class: "sc-result reveal", html: mathHTML(result) });
+  const el = h(
+    "div",
+    { class: "scene sc-bars" },
+    eq,
+    h("div", { class: "bar-stack" }, rowEls),
+    h("div", { class: "sc-foot" }, res),
+  );
+  const cues = rowEls.map((r, i) => ({
+    at: 0.06 + (0.62 * i) / Math.max(1, rowEls.length),
+    run: () => show(r),
+  }));
+  cues.push({ at: 0.82, run: () => show(res) });
+  return view(el, cues, () => [...rowEls, res].forEach(show));
+}
+
+// ---------- hundred square ----------
+
+function grid100(mathText: string, shaded: number, result: string): SceneView {
+  const cells = Array.from({ length: 100 }, () => h("span", { class: "g100-cell" }));
+  const grid = h(
+    "div",
+    { class: "g100", role: "img", "aria-label": `${shaded} of 100 squares shaded` },
+    cells,
+  );
+  const eq = h("p", { class: "sc-bigmath", html: mathHTML(mathText) });
+  const res = h("p", { class: "sc-result reveal", html: mathHTML(result) });
+  const el = h(
+    "div",
+    { class: "scene sc-grid100" },
+    h("div", { class: "g100-row" }, grid, h("div", { class: "g100-side" }, eq, res)),
+  );
+  const fill = (n: number) => cells.forEach((c, i) => c.classList.toggle("on", i < n));
+  const steps = 10;
+  const cues = Array.from({ length: steps }, (_, i) => ({
+    at: 0.12 + (0.55 * i) / steps,
+    run: () => fill(Math.round((shaded * (i + 1)) / steps)),
+  }));
+  cues.push({ at: 0.78, run: () => show(res) });
+  return view(el, cues, () => {
+    fill(shaded);
+    show(res);
+  });
 }

@@ -1,107 +1,11 @@
 import { Rng } from "../engine/rng";
-import { fmtInt, fmtQ, linear, MINUS, paren, signed, term } from "../math/format";
+import { fmtInt, linear, MINUS, paren, signed, term } from "../math/format";
 import { Q, q } from "../math/q";
-import type { MisconceptionId } from "./misconceptions";
+import { FRACTION_GENERATORS } from "./generators-fractions";
+import { assemble, expr, near, num, type Check, type Gen, type Item, type Unit } from "./item";
 import type { SkillId } from "./skills";
 
-export type Letter = "A" | "B" | "C" | "D";
-
-export interface Option {
-  letter: Letter;
-  text: string;
-  /** Canonical value: "7", "-7/3", or "e:5:4:1" for 5x + 4. */
-  key: string;
-  correct: boolean;
-  /** The mistake that produces this wrong answer, when we know it. */
-  misconception?: MisconceptionId;
-}
-
-/** Enough structure for an independent check of the correct answer (see tests). */
-export type Check =
-  | { kind: "arith"; op: "+" | "-" | "*" | "/"; a: number; b: number }
-  | { kind: "collect"; terms: { coef: number; x: boolean }[] }
-  | { kind: "expand"; k: number; a: number; b: number }
-  | { kind: "equation"; left: [Q, Q]; right: [Q, Q] };
-
-export interface Item {
-  id: string;
-  skill: SkillId;
-  seed: number;
-  prompt: string;
-  /** The expression or equation, shown large. Absent for word problems. */
-  math?: string;
-  options: Option[];
-  /** Worked solution, one step per line. */
-  solution: string[];
-  check: Check;
-}
-
-interface Cand {
-  text: string;
-  key: string;
-  misconception?: MisconceptionId;
-}
-
-interface Unit {
-  pre?: string;
-  post?: string;
-}
-
-function num(v: Q | number, m?: MisconceptionId, unit: Unit = {}): Cand {
-  return {
-    text: `${unit.pre ?? ""}${fmtQ(v)}${unit.post ?? ""}`,
-    key: q(v).key(),
-    misconception: m,
-  };
-}
-
-function expr(a: number, b: number, m?: MisconceptionId, power = 1): Cand {
-  return { text: linear(a, b, "x", power), key: `e:${a}:${b}:${power}`, misconception: m };
-}
-
-const LETTERS: Letter[] = ["A", "B", "C", "D"];
-
-function assemble(
-  rng: Rng,
-  correct: Cand,
-  distractors: Cand[],
-  filler: (i: number) => Cand | null,
-): Option[] {
-  const picked: Cand[] = [correct];
-  const seen = new Set([correct.key]);
-  for (const d of distractors) {
-    if (picked.length >= 4) break;
-    if (!seen.has(d.key)) {
-      seen.add(d.key);
-      picked.push(d);
-    }
-  }
-  for (let i = 1; picked.length < 4; i++) {
-    if (i > 60) throw new Error("could not fill options");
-    const f = filler(i);
-    if (f && !seen.has(f.key)) {
-      seen.add(f.key);
-      picked.push(f);
-    }
-  }
-  return rng.shuffle(picked).map((c, i) => ({
-    letter: LETTERS[i] as Letter,
-    text: c.text,
-    key: c.key,
-    correct: c.key === correct.key,
-    misconception: c.key === correct.key ? undefined : c.misconception,
-  }));
-}
-
-/** Near misses around the answer: +1, −1, +2, −2 … */
-function near(value: number, unit: Unit = {}, positiveOnly = false) {
-  return (i: number): Cand | null => {
-    const step = Math.ceil(i / 2) * (i % 2 ? 1 : -1);
-    const v = value + step;
-    if (positiveOnly && v <= 0) return null;
-    return num(v, undefined, unit);
-  };
-}
+export type { Check, Item, Letter, Option } from "./item";
 
 const LETTER_VARS = ["x", "y", "n", "m", "p"] as const;
 const NAMES = [
@@ -118,8 +22,6 @@ const NAMES = [
   "Adjoa",
   "Kwabena",
 ];
-
-type Gen = (rng: Rng) => Omit<Item, "id" | "skill" | "seed">;
 
 const intAdd: Gen = (rng) => {
   const form = rng.int(0, 3);
@@ -707,6 +609,7 @@ export const GENERATORS: Record<SkillId, Gen> = {
   "eq-brackets": eqBrackets,
   "eq-fractions": eqFractions,
   "eq-word": eqWord,
+  ...FRACTION_GENERATORS,
 };
 
 /** Build one question for a skill. The same (skill, seed) always gives the same question. */

@@ -64,7 +64,7 @@ function frac(top: string, bottom: string): string {
 export function mathHTML(text: string): string {
   let out = esc(text);
   out = out.replace(/\(([^()]+)\)\/(\d+)/g, (_m, top: string, bottom: string) => frac(top, bottom));
-  out = out.replace(/(\d+|[a-z])\/(\d+)/g, (_m, top: string, bottom: string) => frac(top, bottom));
+  out = out.replace(/(\d+|[a-z?])\/(\d+)/g, (_m, top: string, bottom: string) => frac(top, bottom));
   out = out.replace(VARS, (_m, pre: string, v: string) => `${pre}<i class="var">${v}</i>`);
   return out;
 }

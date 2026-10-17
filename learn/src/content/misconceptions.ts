@@ -23,7 +23,28 @@ export type MisconceptionId =
   | "eq-multiply-one-term"
   | "word-wrong-unknown"
   | "word-incomplete"
-  | "word-ignored-difference";
+  | "word-ignored-difference"
+  | "frac-flip"
+  | "frac-partial-simplify"
+  | "frac-divide-one-part"
+  | "frac-add-to-equivalent"
+  | "frac-add-across"
+  | "frac-numerators-unchanged"
+  | "frac-forgot-carry"
+  | "frac-wrong-operation"
+  | "frac-cross-multiply"
+  | "frac-divide-no-flip"
+  | "frac-flip-wrong-one"
+  | "frac-of-incomplete"
+  | "pct-forgot-100"
+  | "pct-place-value"
+  | "pct-digits-as-percent"
+  | "pct-over-ten"
+  | "pct-wrong-part"
+  | "pct-percent-as-amount"
+  | "pct-direction"
+  | "pct-wrong-base"
+  | "pct-ratio-not-change";
 
 export interface Misconception {
   id: MisconceptionId;
@@ -216,5 +237,162 @@ export const MISCONCEPTIONS: Record<MisconceptionId, Misconception> = {
     did: "You left out one piece of information from the question.",
     fix: "Every number in the question is there for a reason. Use them all.",
     root: "eq-word",
+  }),
+  "frac-flip": M({
+    id: "frac-flip",
+    label: "Turns a fraction upside down",
+    did: "You turned the fraction upside down.",
+    fix: "The top number counts the parts you have. The bottom number says how many parts make a whole.",
+    root: "frac-simplify",
+  }),
+  "frac-partial-simplify": M({
+    id: "frac-partial-simplify",
+    label: "Stops simplifying too early",
+    did: "You simplified, but not all the way.",
+    fix: "Keep dividing until no number except 1 divides both the top and the bottom.",
+    root: "frac-simplify",
+  }),
+  "frac-divide-one-part": M({
+    id: "frac-divide-one-part",
+    label: "Changes only the top or only the bottom",
+    did: "You changed only the top or only the bottom of the fraction.",
+    fix: "Whatever you do to the top, do the same to the bottom.",
+    root: "frac-simplify",
+  }),
+  "frac-add-to-equivalent": M({
+    id: "frac-add-to-equivalent",
+    label: "Adds to make equivalent fractions",
+    did: "You added the same number to the top and bottom.",
+    fix: "Equivalent fractions come from multiplying or dividing top and bottom, never from adding.",
+    root: "frac-simplify",
+  }),
+  "frac-add-across": M({
+    id: "frac-add-across",
+    label: "Adds the denominators",
+    did: "You added the bottom numbers as well as the tops.",
+    fix: "Make the bottoms the same, then add only the tops. The bottom stays the same.",
+    root: "frac-add",
+    lesson: "fix-add-across",
+  }),
+  "frac-numerators-unchanged": M({
+    id: "frac-numerators-unchanged",
+    label: "Changes the denominator but not the numerator",
+    did: "You changed the bottom numbers but not the tops.",
+    fix: "If the bottom is multiplied by a number, multiply the top by the same number.",
+    root: "frac-add",
+    lesson: "fix-numerators-unchanged",
+  }),
+  "frac-forgot-carry": M({
+    id: "frac-forgot-carry",
+    label: "Loses the carried whole",
+    did: "The fractions added up to more than one whole, and that extra whole went missing.",
+    fix: "If the fraction part is bigger than 1, carry the whole number across.",
+    root: "frac-add",
+  }),
+  "frac-wrong-operation": M({
+    id: "frac-wrong-operation",
+    label: "Uses the wrong operation with fractions",
+    did: "You used a different operation from the one in the question.",
+    fix: "Check the sign first: +, −, × or ÷. Each one has its own method.",
+    root: "frac-mul",
+  }),
+  "frac-cross-multiply": M({
+    id: "frac-cross-multiply",
+    label: "Multiplies diagonally",
+    did: "You multiplied diagonally across the fractions.",
+    fix: "To multiply fractions, go straight across: top × top and bottom × bottom.",
+    root: "frac-mul",
+  }),
+  "frac-divide-no-flip": M({
+    id: "frac-divide-no-flip",
+    label: "Divides without flipping",
+    did: "You multiplied without flipping the second fraction.",
+    fix: "Keep the first fraction, change ÷ to ×, and flip the second fraction.",
+    root: "frac-mul",
+    lesson: "fix-keep-change-flip",
+  }),
+  "frac-flip-wrong-one": M({
+    id: "frac-flip-wrong-one",
+    label: "Flips the wrong fraction",
+    did: "You flipped the first fraction instead of the second.",
+    fix: "Keep the first fraction as it is. Flip only the one you are dividing by.",
+    root: "frac-mul",
+    lesson: "fix-keep-change-flip",
+  }),
+  "frac-of-incomplete": M({
+    id: "frac-of-incomplete",
+    label: "Does half of a “fraction of”",
+    did: "You did only one of the two steps for a fraction of an amount.",
+    fix: "For 3/4 of 20, divide by the bottom (20 ÷ 4 = 5), then multiply by the top (5 × 3 = 15).",
+    root: "frac-mul",
+  }),
+  "pct-forgot-100": M({
+    id: "pct-forgot-100",
+    label: "Forgets that percent means out of 100",
+    did: "You forgot that percent means out of 100.",
+    fix: "To make a percentage, multiply by 100. To use a percentage, divide by 100.",
+    root: "frac-dec-pct",
+    lesson: "fix-percent-hundred",
+  }),
+  "pct-place-value": M({
+    id: "pct-place-value",
+    label: "Moves the decimal point the wrong number of places",
+    did: "You moved the decimal point the wrong number of places.",
+    fix: "× 100 moves the point two places to the right. ÷ 100 moves it two places to the left.",
+    root: "frac-dec-pct",
+    lesson: "fix-percent-hundred",
+  }),
+  "pct-digits-as-percent": M({
+    id: "pct-digits-as-percent",
+    label: "Joins the digits of a fraction into a percentage",
+    did: "You joined the digits of the fraction together to make a percentage.",
+    fix: "3/8 is not 38%. Divide 3 by 8, then multiply by 100.",
+    root: "frac-dec-pct",
+  }),
+  "pct-over-ten": M({
+    id: "pct-over-ten",
+    label: "Writes a percentage over 10",
+    did: "You wrote the percentage over 10 instead of over 100.",
+    fix: "Percent means out of 100: 40% = 40/100.",
+    root: "frac-dec-pct",
+    lesson: "fix-percent-hundred",
+  }),
+  "pct-wrong-part": M({
+    id: "pct-wrong-part",
+    label: "Finds the other part",
+    did: "You found the other part: the discount instead of the new price, or the rest instead of the part asked for.",
+    fix: "Read the last sentence again. Which amount is it asking for?",
+    root: "pct-of",
+    lesson: "fix-which-amount",
+  }),
+  "pct-percent-as-amount": M({
+    id: "pct-percent-as-amount",
+    label: "Treats a percentage as an amount",
+    did: "You treated the percentage as if it were an amount of money or a number of things.",
+    fix: "20% of GH₵250 is GH₵50, not GH₵20. Work out the percentage of the amount first.",
+    root: "pct-of",
+  }),
+  "pct-direction": M({
+    id: "pct-direction",
+    label: "Increases instead of decreasing (or the reverse)",
+    did: "You went the wrong way: up when the price went down, or down when it went up.",
+    fix: "Increase or profit: add. Decrease, discount or loss: subtract.",
+    root: "pct-change",
+  }),
+  "pct-wrong-base": M({
+    id: "pct-wrong-base",
+    label: "Divides by the new amount",
+    did: "You divided by the new amount instead of the original amount.",
+    fix: "Percentage change = change ÷ original amount × 100.",
+    root: "pct-change",
+    lesson: "fix-original-amount",
+  }),
+  "pct-ratio-not-change": M({
+    id: "pct-ratio-not-change",
+    label: "Gives the new amount as a percentage of the old",
+    did: "You worked out the new amount as a percentage of the old one, not the change.",
+    fix: "Subtract first to find the change, then divide by the original amount.",
+    root: "pct-change",
+    lesson: "fix-original-amount",
   }),
 };

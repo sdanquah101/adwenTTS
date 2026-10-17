@@ -320,7 +320,7 @@ export function onboard(app: App): View {
 
 // ---------------------------------------------------------------- home
 
-const STRAND_ORDER: Strand[] = ["Equations", "Algebra", "Number"];
+const STRAND_ORDER: Strand[] = ["Equations", "Fractions and percentages", "Algebra", "Number"];
 
 export function home(app: App): View {
   const d = app.data;
@@ -1059,7 +1059,7 @@ export function profile(app: App): View {
           ? `Answers quickly (about ${Math.round(ins.medianSeconds ?? 0)} seconds per question).${ins.paceFactor > 1 ? " Accuracy is good, so narration runs a little faster." : " Slowing down could help accuracy."}`
           : `Steady pace, about ${Math.round(ins.medianSeconds ?? 0)} seconds per question.`;
 
-  const strands: Strand[] = ["Number", "Algebra", "Equations"];
+  const strands: Strand[] = ["Number", "Fractions and percentages", "Algebra", "Equations"];
   const resetArea = h("div", { class: "reset" });
   const drawReset = () => {
     resetArea.replaceChildren(

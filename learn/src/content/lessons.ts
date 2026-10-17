@@ -45,7 +45,15 @@ export type Scene =
     }
   | { type: "tiles"; math: string; tiles: Tile[]; result: string; say: Say }
   | { type: "contrast"; wrong: string; right: string; why: string; say: Say }
-  | { type: "rule"; title: string; body: string[]; say: Say };
+  | { type: "rule"; title: string; body: string[]; say: Say }
+  | {
+      type: "bars";
+      math: string;
+      rows: { parts: number; shaded: number; label: string }[];
+      result: string;
+      say: Say;
+    }
+  | { type: "grid100"; math: string; shaded: number; result: string; say: Say };
 
 export type Style = "visual" | "balance" | "undo" | "fix";
 
@@ -927,6 +935,558 @@ export const LESSONS: Lesson[] = [
         ],
         say: {
           text: "Before you choose an answer, read the last sentence again. Who or what is it asking about? Make sure your answer is that thing, not another number from your working.",
+        },
+      },
+    ],
+  }),
+  // ---------------------------------------------------------------- fractions and percentages
+  L({
+    id: "frac-simplify-visual",
+    skill: "frac-simplify",
+    title: "Same amount, different names",
+    style: "visual",
+    scenes: [
+      {
+        type: "intro",
+        kicker: "Fractions",
+        title: "Simplifying fractions",
+        say: {
+          text: "Different fractions can describe the same amount. Simplifying means writing the fraction with the smallest numbers possible.",
+          simple:
+            "Some fractions look different but are the same amount. Simplifying makes the numbers as small as possible.",
+        },
+      },
+      {
+        type: "bars",
+        math: "3/4 = 6/8 = 9/12",
+        rows: [
+          { parts: 4, shaded: 3, label: "3/4" },
+          { parts: 8, shaded: 6, label: "6/8" },
+          { parts: 12, shaded: 9, label: "9/12" },
+        ],
+        result: "same length, so equal",
+        say: {
+          text: "Look at these bars. Three quarters, six eighths and nine twelfths are all the same length. They are equivalent fractions.",
+          simple:
+            "Three quarters, six eighths and nine twelfths are the same length. They are equal.",
+        },
+      },
+      {
+        type: "steps",
+        lines: [
+          { expr: "18/24" },
+          { expr: "18 ÷ 6 = 3 and 24 ÷ 6 = 4", note: "6 divides both" },
+          { expr: "18/24 = 3/4" },
+        ],
+        say: {
+          text: "To simplify eighteen over twenty-four, find the biggest number that divides both. Six divides eighteen and twenty-four. Eighteen divided by six is three, and twenty-four divided by six is four. So it is three quarters.",
+          simple:
+            "Find a number that divides both. Six works. Eighteen divided by six is three. Twenty-four divided by six is four. Three quarters.",
+        },
+      },
+      {
+        type: "contrast",
+        wrong: "18/24 = 9/12",
+        right: "18/24 = 3/4",
+        why: "9/12 is equal, but 3 still divides both 9 and 12. Keep going.",
+        say: {
+          text: "Nine twelfths is equal, but it is not finished. Three still divides both nine and twelve. Keep going until nothing divides both numbers.",
+          simple: "Nine twelfths is not finished. Three divides nine and twelve. Keep going.",
+        },
+      },
+      {
+        type: "rule",
+        title: "Same to top and bottom",
+        body: [
+          "Multiply or divide top and bottom by the same number.",
+          "Simplest form: no number except 1 divides both.",
+        ],
+        say: {
+          text: "Whatever you do to the top, do to the bottom. A fraction is in its simplest form when no number except one divides both.",
+        },
+      },
+    ],
+  }),
+  L({
+    id: "frac-add-visual",
+    skill: "frac-add",
+    title: "Same-size pieces first",
+    style: "visual",
+    scenes: [
+      {
+        type: "intro",
+        kicker: "Fractions",
+        title: "Adding and subtracting fractions",
+        say: {
+          text: "You can only add fractions when the pieces are the same size. So first we make the bottom numbers the same.",
+          simple:
+            "To add fractions, the pieces must be the same size. First make the bottom numbers the same.",
+        },
+      },
+      {
+        type: "bars",
+        math: "2/3 + 1/4",
+        rows: [
+          { parts: 3, shaded: 2, label: "2/3" },
+          { parts: 4, shaded: 1, label: "1/4" },
+          { parts: 12, shaded: 8, label: "8/12" },
+          { parts: 12, shaded: 3, label: "3/12" },
+        ],
+        result: "8/12 + 3/12 = 11/12",
+        say: {
+          text: "Two thirds plus one quarter. Thirds and quarters are different sizes, so cut them both into twelfths. Two thirds is eight twelfths, and one quarter is three twelfths. Now add: eleven twelfths.",
+          simple:
+            "Cut both into twelfths. Two thirds is eight twelfths. One quarter is three twelfths. Together: eleven twelfths.",
+        },
+      },
+      {
+        type: "steps",
+        lines: [
+          { expr: "2/3 + 1/4" },
+          { expr: "8/12 + 3/12", note: "common denominator 12" },
+          { expr: "11/12", note: "add the tops only" },
+        ],
+        say: {
+          text: "In writing: the common denominator is twelve. Change both fractions, then add only the tops. The bottom stays twelve.",
+          simple: "Make both bottoms twelve. Add the tops. The bottom stays twelve.",
+        },
+      },
+      {
+        type: "contrast",
+        wrong: "1/2 + 1/2 = 2/4",
+        right: "1/2 + 1/2 = 2/2 = 1",
+        why: "Add the tops only. The bottom number is the size of the pieces, and that does not change.",
+        say: {
+          text: "Never add the bottom numbers. Half an orange plus half an orange is one whole orange, not two quarters.",
+        },
+      },
+      {
+        type: "steps",
+        lines: [
+          { expr: "2 3/4 + 1 2/3" },
+          { expr: "3 + 9/12 + 8/12", note: "wholes, then fractions" },
+          { expr: "3 + 17/12 = 3 + 1 5/12" },
+          { expr: "4 5/12" },
+        ],
+        say: {
+          text: "With mixed numbers, add the whole numbers, then the fractions. Two plus one is three. Three quarters plus two thirds is seventeen twelfths, which is one and five twelfths. So the answer is four and five twelfths.",
+          simple:
+            "Add the wholes: three. Add the fractions: seventeen twelfths, which is one and five twelfths. Answer: four and five twelfths.",
+        },
+      },
+      {
+        type: "rule",
+        title: "Three steps",
+        body: [
+          "1. Make the bottom numbers the same.",
+          "2. Add or subtract the top numbers.",
+          "3. Simplify.",
+        ],
+        say: {
+          text: "Three steps. Make the bottom numbers the same. Add or subtract the top numbers. Then simplify.",
+        },
+      },
+    ],
+  }),
+  L({
+    id: "frac-mul-visual",
+    skill: "frac-mul",
+    title: "Straight across, then flip to divide",
+    style: "visual",
+    scenes: [
+      {
+        type: "intro",
+        kicker: "Fractions",
+        title: "Multiplying and dividing fractions",
+        say: {
+          text: "Multiplying fractions is the easy one: multiply the tops and multiply the bottoms. Dividing needs one extra step.",
+          simple:
+            "To multiply: tops times tops, bottoms times bottoms. Dividing has one more step.",
+        },
+      },
+      {
+        type: "steps",
+        lines: [
+          { expr: "2/3 × 3/5" },
+          { expr: "tops: 2 × 3 = 6,  bottoms: 3 × 5 = 15" },
+          { expr: "6/15 = 2/5", note: "simplify" },
+        ],
+        say: {
+          text: "Two thirds times three fifths. Tops: two times three is six. Bottoms: three times five is fifteen. Six fifteenths simplifies to two fifths.",
+          simple:
+            "Two times three is six. Three times five is fifteen. Six fifteenths is two fifths.",
+        },
+      },
+      {
+        type: "steps",
+        lines: [
+          { expr: "3/4 of 20" },
+          { expr: "20 ÷ 4 = 5", note: "one quarter" },
+          { expr: "5 × 3 = 15", note: "three quarters" },
+        ],
+        say: {
+          text: "Of means multiply. Three quarters of twenty: one quarter of twenty is five, so three quarters is fifteen.",
+          simple: "Of means times. A quarter of twenty is five. Three quarters is fifteen.",
+        },
+      },
+      {
+        type: "steps",
+        lines: [
+          { expr: "3/4 ÷ 1/2" },
+          { expr: "3/4 × 2/1", note: "keep, change, flip" },
+          { expr: "6/4 = 1 1/2" },
+        ],
+        say: {
+          text: "To divide, keep the first fraction, change divide to times, and flip the second fraction. Three quarters times two over one is six quarters, which is one and a half.",
+          simple:
+            "Keep the first. Change divide to times. Flip the second. Six quarters is one and a half.",
+        },
+      },
+      {
+        type: "contrast",
+        wrong: "3/4 ÷ 1/2 = 3/8",
+        right: "3/4 ÷ 1/2 = 1 1/2",
+        why: "Dividing by a half makes it bigger. Flip the second fraction, then multiply.",
+        say: {
+          text: "If you forget to flip, you get three eighths. But dividing by a half asks how many halves fit in, and that makes the answer bigger.",
+        },
+      },
+      {
+        type: "rule",
+        title: "Keep, change, flip",
+        body: ["Keep the first fraction.", "Change ÷ to ×.", "Flip the second fraction."],
+        say: { text: "To divide fractions: keep, change, flip. Then multiply." },
+      },
+    ],
+  }),
+  L({
+    id: "frac-dec-pct-visual",
+    skill: "frac-dec-pct",
+    title: "Out of a hundred",
+    style: "visual",
+    scenes: [
+      {
+        type: "intro",
+        kicker: "Percentages",
+        title: "Fractions, decimals and percentages",
+        say: {
+          text: "Percent means out of one hundred. Fractions, decimals and percentages are three ways of writing the same amount.",
+          simple:
+            "Percent means out of one hundred. A fraction, a decimal and a percentage can all show the same amount.",
+        },
+      },
+      {
+        type: "grid100",
+        math: "25 out of 100",
+        shaded: 25,
+        result: "1/4 = 0.25 = 25%",
+        say: {
+          text: "Here are one hundred squares, and twenty-five are shaded. That is twenty-five out of a hundred, or twenty-five percent. As a fraction it is one quarter, and as a decimal it is nought point two five.",
+          simple:
+            "Twenty-five of the hundred squares are shaded. That is twenty-five percent. It is also one quarter, and nought point two five.",
+        },
+      },
+      {
+        type: "steps",
+        lines: [
+          { expr: "3/8" },
+          { expr: "3 ÷ 8 = 0.375", note: "divide" },
+          { expr: "0.375 × 100 = 37.5%", note: "× 100" },
+        ],
+        say: {
+          text: "To turn a fraction into a percentage, divide the top by the bottom, then multiply by one hundred. Three divided by eight is nought point three seven five, which is thirty-seven point five percent.",
+          simple:
+            "Divide the top by the bottom. Then times one hundred. Three eighths is thirty-seven point five percent.",
+        },
+      },
+      {
+        type: "steps",
+        lines: [
+          { expr: "40%" },
+          { expr: "40/100", note: "out of 100" },
+          { expr: "2/5", note: "simplify" },
+        ],
+        say: {
+          text: "To turn a percentage into a fraction, write it over one hundred and simplify. Forty percent is forty over one hundred, which is two fifths.",
+          simple:
+            "Put the percentage over one hundred. Then simplify. Forty percent is two fifths.",
+        },
+      },
+      {
+        type: "contrast",
+        wrong: "0.07 = 70%",
+        right: "0.07 = 7%",
+        why: "× 100 moves the decimal point two places to the right.",
+        say: {
+          text: "Careful with decimals. Multiplying by one hundred moves the point two places. Nought point nought seven is seven percent, not seventy.",
+        },
+      },
+      {
+        type: "rule",
+        title: "Two moves",
+        body: ["Fraction or decimal to %: × 100", "% to fraction: write over 100, then simplify"],
+        say: {
+          text: "Two moves to remember. To make a percentage, multiply by one hundred. To turn a percentage into a fraction, write it over one hundred and simplify.",
+        },
+      },
+    ],
+  }),
+  L({
+    id: "pct-of-visual",
+    skill: "pct-of",
+    title: "Percentages of amounts",
+    style: "visual",
+    scenes: [
+      {
+        type: "intro",
+        kicker: "Percentages",
+        title: "Finding a percentage of an amount",
+        say: {
+          text: "To find a percentage of an amount, think of the whole amount as one hundred percent.",
+          simple: "The whole amount is one hundred percent.",
+        },
+      },
+      {
+        type: "steps",
+        lines: [
+          { expr: "10% of GH₵80" },
+          { expr: "80 ÷ 10 = 8", note: "10% is one tenth" },
+          { expr: "GH₵8" },
+        ],
+        say: {
+          text: "Ten percent is one tenth. Ten percent of eighty cedis is eight cedis.",
+        },
+      },
+      {
+        type: "steps",
+        lines: [
+          { expr: "35% of GH₵80" },
+          { expr: "10% = 8,  so 30% = 24", note: "build it up" },
+          { expr: "5% = 4", note: "half of 10%" },
+          { expr: "35% = 24 + 4 = GH₵28" },
+        ],
+        say: {
+          text: "Build bigger percentages from ten percent. Ten percent is eight, so thirty percent is twenty-four. Five percent is half of ten percent, which is four. So thirty-five percent is twenty-eight cedis.",
+          simple:
+            "Ten percent is eight. Thirty percent is twenty-four. Five percent is four. Thirty-five percent is twenty-eight cedis.",
+        },
+      },
+      {
+        type: "steps",
+        lines: [
+          { expr: "35% of 80" },
+          { expr: "35/100 × 80", note: "or multiply" },
+          { expr: "= 28" },
+        ],
+        say: {
+          text: "You can also multiply: thirty-five over one hundred, times eighty, is twenty-eight. Both methods give the same answer.",
+        },
+      },
+      {
+        type: "contrast",
+        wrong: "600 students, 35% girls: 390 girls",
+        right: "35/100 × 600 = 210 girls",
+        why: "390 is the number of boys. Answer the question that was asked.",
+        say: {
+          text: "Read the question carefully. If thirty-five percent of six hundred students are girls, there are two hundred and ten girls. Three hundred and ninety is the number of boys.",
+        },
+      },
+      {
+        type: "rule",
+        title: "Percent of an amount",
+        body: ["10% = ÷ 10", "1% = ÷ 100", "Build up from these, or use p/100 × amount."],
+        say: {
+          text: "Ten percent means divide by ten. One percent means divide by one hundred. Build up from these, or multiply by the percentage over one hundred.",
+        },
+      },
+    ],
+  }),
+  L({
+    id: "pct-change-visual",
+    skill: "pct-change",
+    title: "Prices up and down",
+    style: "visual",
+    scenes: [
+      {
+        type: "intro",
+        kicker: "Percentages",
+        title: "Percentage increase, decrease and profit",
+        say: {
+          text: "Prices go up and down. Percentage change tells us by how much, compared with the original price.",
+          simple:
+            "Prices change. A percentage tells us how much, compared with the price at the start.",
+        },
+      },
+      {
+        type: "steps",
+        lines: [
+          { expr: "GH₵250, reduced by 20%" },
+          { expr: "20% of 250 = 50", note: "the discount" },
+          { expr: "250 − 50 = GH₵200", note: "sale price" },
+        ],
+        say: {
+          text: "A bag costs two hundred and fifty cedis and is reduced by twenty percent. Twenty percent of two hundred and fifty is fifty. Take it away, and the sale price is two hundred cedis.",
+          simple:
+            "Twenty percent of two hundred and fifty is fifty. Two hundred and fifty minus fifty is two hundred cedis.",
+        },
+      },
+      {
+        type: "steps",
+        lines: [
+          { expr: "GH₵40, increased by 25%" },
+          { expr: "25% of 40 = 10" },
+          { expr: "40 + 10 = GH₵50" },
+        ],
+        say: {
+          text: "An increase works the same way, but we add. Twenty-five percent of forty is ten, so the new price is fifty cedis.",
+        },
+      },
+      {
+        type: "steps",
+        lines: [
+          { expr: "GH₵40 rose to GH₵50" },
+          { expr: "change = 10", note: "new − old" },
+          { expr: "10/40 × 100 = 25%", note: "÷ original" },
+        ],
+        say: {
+          text: "To find the percentage change, find the change, divide by the original amount, and multiply by one hundred. The price went up by ten from forty. Ten over forty, times one hundred, is twenty-five percent.",
+          simple:
+            "The change is ten. Divide by the old price, forty. Times one hundred. Twenty-five percent.",
+        },
+      },
+      {
+        type: "contrast",
+        wrong: "10/50 × 100 = 20%",
+        right: "10/40 × 100 = 25%",
+        why: "Always divide by the original amount, the one before the change.",
+        say: {
+          text: "Do not divide by the new price. Percentage change is always compared with the original amount.",
+        },
+      },
+      {
+        type: "rule",
+        title: "Profit and loss",
+        body: [
+          "Profit or loss = selling price − cost price",
+          "% profit = profit ÷ cost price × 100",
+        ],
+        say: {
+          text: "Profit and loss work the same way. The cost price is the original amount. Percentage profit is the profit divided by the cost price, times one hundred.",
+        },
+      },
+    ],
+  }),
+  L({
+    id: "fix-add-across",
+    skill: "frac-add",
+    title: "Halves of an orange",
+    style: "fix",
+    scenes: [
+      {
+        type: "bars",
+        math: "1/2 + 1/2",
+        rows: [
+          { parts: 2, shaded: 1, label: "1/2" },
+          { parts: 2, shaded: 1, label: "1/2" },
+          { parts: 2, shaded: 2, label: "2/2" },
+        ],
+        result: "1/2 + 1/2 = 1 whole",
+        say: {
+          text: "Two halves make one whole. If we added the bottom numbers we would get two quarters, which is only half. Add the tops, and keep the bottom the same.",
+        },
+      },
+    ],
+  }),
+  L({
+    id: "fix-numerators-unchanged",
+    skill: "frac-add",
+    title: "Change the top too",
+    style: "fix",
+    scenes: [
+      {
+        type: "steps",
+        lines: [
+          { expr: "1/3 + 1/4" },
+          { expr: "4/12 + 3/12", note: "tops change too" },
+          { expr: "7/12" },
+        ],
+        say: {
+          text: "When you change the bottom to twelve, the top must change too. One third is four twelfths, not one twelfth. One quarter is three twelfths. Together, seven twelfths.",
+        },
+      },
+    ],
+  }),
+  L({
+    id: "fix-keep-change-flip",
+    skill: "frac-mul",
+    title: "Flip the second one",
+    style: "fix",
+    scenes: [
+      {
+        type: "steps",
+        lines: [
+          { expr: "2/5 ÷ 3/4" },
+          { expr: "2/5 × 4/3", note: "flip only the second" },
+          { expr: "8/15" },
+        ],
+        say: {
+          text: "Keep the first fraction exactly as it is. Change divide to times. Flip only the second fraction, the one you are dividing by. Two fifths times four thirds is eight fifteenths.",
+        },
+      },
+    ],
+  }),
+  L({
+    id: "fix-percent-hundred",
+    skill: "frac-dec-pct",
+    title: "Percent means out of 100",
+    style: "fix",
+    scenes: [
+      {
+        type: "grid100",
+        math: "0.07",
+        shaded: 7,
+        result: "0.07 = 7/100 = 7%",
+        say: {
+          text: "Nought point nought seven means seven hundredths: seven squares out of a hundred. That is seven percent. Percent always means out of one hundred.",
+        },
+      },
+    ],
+  }),
+  L({
+    id: "fix-which-amount",
+    skill: "pct-of",
+    title: "Which amount?",
+    style: "fix",
+    scenes: [
+      {
+        type: "rule",
+        title: "Which amount?",
+        body: [
+          "The part, or what is left?",
+          "The discount, or the new price?",
+          "Check the last sentence before you choose.",
+        ],
+        say: {
+          text: "Percentage questions often have two answers hiding in the working: the part, and what is left. Before you choose, read the last sentence again and check which one it asks for.",
+        },
+      },
+    ],
+  }),
+  L({
+    id: "fix-original-amount",
+    skill: "pct-change",
+    title: "Divide by the original",
+    style: "fix",
+    scenes: [
+      {
+        type: "steps",
+        lines: [
+          { expr: "GH₵80 fell to GH₵60" },
+          { expr: "change = 20", note: "subtract first" },
+          { expr: "20/80 × 100 = 25%", note: "÷ original 80" },
+        ],
+        say: {
+          text: "First subtract to find the change: twenty. Then divide by the original amount, eighty, not the new one. Twenty over eighty, times one hundred, is a twenty-five percent decrease.",
         },
       },
     ],

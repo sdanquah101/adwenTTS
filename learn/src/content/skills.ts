@@ -8,9 +8,15 @@ export type SkillId =
   | "eq-both-sides"
   | "eq-brackets"
   | "eq-fractions"
-  | "eq-word";
+  | "eq-word"
+  | "frac-simplify"
+  | "frac-add"
+  | "frac-mul"
+  | "frac-dec-pct"
+  | "pct-of"
+  | "pct-change";
 
-export type Strand = "Number" | "Algebra" | "Equations";
+export type Strand = "Number" | "Fractions and percentages" | "Algebra" | "Equations";
 
 export interface Skill {
   id: SkillId;
@@ -108,6 +114,54 @@ export const SKILLS: Skill[] = [
     blurb: "Turning a story into an equation",
     example: "Ama is 3 years older than Kojo…",
     prereqs: ["eq-two-step"],
+  },
+  {
+    id: "frac-simplify",
+    title: "Simplifying fractions",
+    strand: "Fractions and percentages",
+    blurb: "Equivalent fractions and simplest form",
+    example: "18/24",
+    prereqs: [],
+  },
+  {
+    id: "frac-add",
+    title: "Adding and subtracting fractions",
+    strand: "Fractions and percentages",
+    blurb: "Different denominators and mixed numbers",
+    example: "2/3 + 1/4",
+    prereqs: ["frac-simplify"],
+  },
+  {
+    id: "frac-mul",
+    title: "Multiplying and dividing fractions",
+    strand: "Fractions and percentages",
+    blurb: "Including “of”, and dividing by a fraction",
+    example: "3/4 ÷ 1/2",
+    prereqs: ["frac-simplify"],
+  },
+  {
+    id: "frac-dec-pct",
+    title: "Fractions, decimals and percentages",
+    strand: "Fractions and percentages",
+    blurb: "Changing from one form to another",
+    example: "3/8 = ?%",
+    prereqs: ["frac-simplify"],
+  },
+  {
+    id: "pct-of",
+    title: "Percentage of an amount",
+    strand: "Fractions and percentages",
+    blurb: "Finding a percentage of a quantity",
+    example: "35% of GH₵80",
+    prereqs: ["frac-mul", "frac-dec-pct"],
+  },
+  {
+    id: "pct-change",
+    title: "Percentage increase, decrease and profit",
+    strand: "Fractions and percentages",
+    blurb: "Discounts, price rises, profit and loss",
+    example: "GH₵250 less 20%",
+    prereqs: ["pct-of"],
   },
 ];
 

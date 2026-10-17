@@ -53,7 +53,11 @@ export function q(x: Q | number): Q {
   return x instanceof Q ? x : new Q(x);
 }
 
-function gcd(a: number, b: number): number {
+export function gcd(a: number, b: number): number {
   while (b) [a, b] = [b, a % b];
   return a;
+}
+
+export function lcm(a: number, b: number): number {
+  return (a / gcd(a, b)) * b;
 }
