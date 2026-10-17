@@ -19,6 +19,7 @@ import { h, math, mathHTML, sleep } from "./dom";
 import { estimateSeconds, speak, stopAll, type Speech } from "./narrator";
 import { renderScene, type SceneView } from "./scenes";
 import type { App } from "../main";
+import { installState, onInstallChange, persistStorage, promptInstall } from "../pwa";
 
 export interface View {
   el: HTMLElement;
@@ -313,6 +314,7 @@ export function onboard(app: App): View {
     app.data.profile = profile;
     app.setAccent(profile.accent);
     app.commit();
+    persistStorage();
     app.go({ name: "home" });
   });
   return { el: form };
@@ -384,10 +386,12 @@ export function home(app: App): View {
     ),
   );
 
+  const install = installCard();
   const el = h(
     "section",
     { class: "home" },
     h("h1", { class: "display-sm" }, `Hi ${d.profile?.name ?? ""}`),
+    install.el,
     cont,
     h("h2", { class: "section-title" }, "Which topic do you find hard?"),
     h(
@@ -397,7 +401,66 @@ export function home(app: App): View {
     ),
     groups,
   );
-  return { el };
+  return { el, cleanup: install.cleanup };
+}
+
+const DISMISS_KEY = "adwen-maths-install-dismissed";
+
+/** "Install on this phone" card. Shows only when installing is possible and not yet done. */
+function installCard(): View {
+  const el = h("div", { class: "install", hidden: true });
+  const dismissed = () => {
+    try {
+      return localStorage.getItem(DISMISS_KEY) === "1";
+    } catch {
+      return false;
+    }
+  };
+  const draw = () => {
+    const st = installState();
+    const show = st.available && !st.standalone && !dismissed() && (st.canPrompt || st.ios);
+    el.hidden = !show;
+    if (!show) return;
+    const notNow = h(
+      "button",
+      {
+        type: "button",
+        class: "btn btn-quiet",
+        onClick: () => {
+          try {
+            localStorage.setItem(DISMISS_KEY, "1");
+          } catch {
+            /* ignore */
+          }
+          draw();
+        },
+      },
+      "Not now",
+    );
+    el.replaceChildren(
+      h(
+        "div",
+        { class: "install-copy" },
+        h("p", { class: "install-title" }, "Put Adwen Maths on your phone"),
+        h(
+          "p",
+          { class: "muted small" },
+          st.ios
+            ? "Tap the Share button in Safari, then \u201cAdd to Home Screen\u201d. It opens like an app and works without internet."
+            : "It opens like an app from your home screen and works without internet.",
+        ),
+      ),
+      h(
+        "div",
+        { class: "cta" },
+        st.canPrompt ? btn("Install", () => void promptInstall().then(draw)) : null,
+        notNow,
+      ),
+    );
+  };
+  draw();
+  const off = onInstallChange(draw);
+  return { el, cleanup: off };
 }
 
 // ---------------------------------------------------------------- diagnostic

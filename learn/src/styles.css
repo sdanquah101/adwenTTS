@@ -1559,6 +1559,31 @@ input[type="text"]:focus {
   font-weight: 700;
 }
 
+/* install card */
+.install {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.15rem;
+  border-radius: var(--radius);
+  border: 2px dashed var(--accent);
+  background: var(--surface);
+}
+.install-copy {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+  flex: 1 1 16rem;
+}
+.install-title {
+  font-weight: 700;
+}
+.install .cta {
+  margin-top: 0;
+}
+
 /* fraction bars and hundred square */
 .sc-bars {
   gap: 2cqi;

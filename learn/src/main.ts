@@ -5,6 +5,7 @@ import { buildPlan } from "./engine/planner";
 import { clear, emptyData, load, save, type AccentId, type Data } from "./state";
 import { h } from "./ui/dom";
 import { stopAll, warmUp } from "./ui/narrator";
+import { initPwa } from "./pwa";
 import { sampleStudent } from "./ui/sample";
 import * as screens from "./ui/screens";
 
@@ -184,6 +185,7 @@ function boot(): void {
   }
 
   if (app.data.profile) app.setAccent(app.data.profile.accent);
+  initPwa();
   warmUp();
   app.go({ name: app.data.profile ? "home" : "welcome" });
 }

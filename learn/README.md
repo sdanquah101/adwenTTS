@@ -28,13 +28,40 @@ All data stays on the device in `localStorage`.
 
 ```sh
 pnpm install
-pnpm build        # dist/adwen-maths.html: one offline file, about 150 KB
+pnpm build        # see outputs below
 pnpm test         # checks 8,000 generated questions against an independent solver
 pnpm typecheck
 ```
 
-Open `dist/adwen-maths.html` in any browser. The same file can be shared directly.
-`dist/index.html` is the same app without the outer `<html>` wrapper, for hosts that add their own.
+| Output                  | Use it for                                                                                                       |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `dist/app/`             | The installable web app: page, manifest, icons and offline service worker. Deploy this folder to any HTTPS host. |
+| `dist/adwen-maths.html` | One self-contained file, about 150 KB. Open it in any browser or share it directly.                              |
+| `dist/index.html`       | The same app without the outer `<html>` wrapper, for hosts that add their own.                                   |
+
+## Installing on a phone
+
+The installable build is published to GitHub Pages by `.github/workflows/pages.yml` on every
+push to `main` that touches `learn/`. It needs one setting, once: repository **Settings > Pages >
+Build and deployment > Source: GitHub Actions**. The app is then at
+`https://<owner>.github.io/<repo>/`.
+
+- **Android (Chrome):** open the link. The app shows an "Install" card, or use the browser menu and "Install app".
+- **iPhone (Safari):** tap Share, then "Add to Home Screen". The app explains this on iPhones.
+
+After the first visit the app, its fonts and any narration clips played are stored on the phone,
+so it opens and works without internet. Updates download automatically the next time the phone
+is online. Student progress stays on the phone, and the app asks the browser to keep it even
+when storage runs low.
+
+To test locally, serve the folder over HTTP (service workers need `http://localhost` or HTTPS):
+
+```sh
+cd dist/app && python3 -m http.server 8080   # then open http://localhost:8080
+```
+
+To change the icons or install screenshots, edit `scripts/make-icons.mjs` and run
+`node scripts/make-icons.mjs --shots` after a build. The PNGs in `src/icons/` are committed.
 
 ## Narration
 
